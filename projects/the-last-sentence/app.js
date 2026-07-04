@@ -106,6 +106,7 @@
     if (REDUCED) return;
     const ghost = document.createElement('p');
     ghost.className = 'sentence dying' + (ui.sentence.classList.contains('long') ? ' long' : '');
+    ghost.dir = 'auto';
     ghost.textContent = decode(escaped);
     ghost.setAttribute('aria-hidden', 'true');
     ui.box.appendChild(ghost);
@@ -141,6 +142,7 @@
     row.append(seq, life, copy);
     const text = document.createElement('p');
     text.className = 'g-text';
+    text.dir = 'auto'; // RTL sentences keep their base direction
     text.textContent = decode(g.text);
     li.append(row, text);
     return li;

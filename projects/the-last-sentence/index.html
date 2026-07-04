@@ -27,7 +27,7 @@
 
     <section class="alive" aria-label="the sentence currently alive">
       <div id="sentence-box" class="sentence-box">
-        <p id="sentence" class="sentence" aria-live="polite"></p>
+        <p id="sentence" class="sentence" dir="auto" aria-live="polite"></p>
       </div>
       <p class="lifeline">
         <span id="seq" class="seq">#—</span>
@@ -39,7 +39,7 @@
 
     <form id="say-form" class="say" autocomplete="off">
       <label class="visually-hidden" for="input">Write the next sentence</label>
-      <input id="input" name="text" type="text" maxlength="120" spellcheck="false"
+      <input id="input" name="text" type="text" maxlength="120" spellcheck="false" dir="auto"
              placeholder="write the one that replaces it" aria-describedby="feedback">
       <div class="say-row">
         <span id="chars" class="chars">120</span>

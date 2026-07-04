@@ -197,7 +197,9 @@ body {
   padding: 12px 24px;
   min-height: 44px;
   cursor: pointer;
-  transition: border-color 160ms var(--ease-out), color 160ms var(--ease-out), background 160ms var(--ease-out);
+  /* invert instantly: animating background+color together crosses both through
+     the same mid-grey and the label vanishes for a frame */
+  transition: border-color 160ms var(--ease-out);
   font-variant-numeric: tabular-nums;
 }
 #submit:hover:not(:disabled) { background: var(--ink); color: var(--bg); border-color: var(--ink); }
