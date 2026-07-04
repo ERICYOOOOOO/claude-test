@@ -227,18 +227,18 @@ body {
   quotes: none;
 }
 
-.origin {
-  margin-top: 24px;
-  font-size: 12px;
-  color: var(--ink-faint);
-  letter-spacing: 0.06em;
-}
-
 .cite {
-  margin-top: 10px;
+  margin-top: 24px;
   font-size: 15px;
   font-style: normal;
   color: var(--ink-soft);
+  letter-spacing: 0.06em;
+}
+
+.origin {
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--ink-faint);
   letter-spacing: 0.06em;
 }
 
