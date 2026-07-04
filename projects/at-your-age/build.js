@@ -48,7 +48,7 @@ const PAGE_CSS = `
 body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
 background:#fff;color:#111;line-height:1.5}
 .wrap{max-width:760px;margin:0 auto;padding:0 20px}
-.mast{border-bottom:2px solid #111;padding:14px 0 10px;display:flex;justify-content:space-between;align-items:baseline}
+.mast{border-bottom:2px solid #111;padding-top:14px;padding-bottom:10px;display:flex;justify-content:space-between;align-items:baseline}
 .mast a{color:#111;text-decoration:none;font-weight:800;letter-spacing:.14em;font-size:14px}
 .mast span{font-size:11px;letter-spacing:.08em;text-transform:uppercase;opacity:.65}
 h1{font-size:clamp(30px,6vw,52px);line-height:1.05;font-weight:800;letter-spacing:-.03em;margin:48px 0 12px}
