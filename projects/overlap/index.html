@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Overlap — long distance time zone overlap calculator</title>
+<meta name="description" content="Long distance? See how many hours a day you're both awake and free. Pick two cities, set your sleep and work hours, and watch the one window that's actually yours — DST handled, nothing to install.">
+<meta property="og:title" content="Overlap — how much of the day is actually yours?">
+<meta property="og:description" content="Pick two cities. See the hours you're both awake and free, name the window, and count the hours you've spent awake together.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://overlap.love/">
+<meta property="og:image" content="https://overlap.love/og-card.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="6" fill="%230e1526"/><circle cx="13" cy="16" r="7.5" fill="none" stroke="%23c99a52" stroke-width="2"/><circle cx="19" cy="16" r="7.5" fill="none" stroke="%23fff3d6" stroke-width="2"/></svg>'>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="wordmark">Overlap</div>
+    <h1>Two cities. One day. <em>How much of it is actually yours?</em></h1>
+    <p class="sub">Pick where you both live. Overlap finds the hours you're both awake and free — the window the distance hasn't taken. Runs in your browser; nothing leaves it.</p>
+  </header>
+
+  <main>
+    <section class="pickers" aria-label="Choose your two cities">
+      <div class="picker">
+        <div class="picker-label" id="labelA">You</div>
+        <div class="combo" id="comboA">
+          <input type="text" id="cityA" placeholder="your city…" autocomplete="off" spellcheck="false"
+                 role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="listA" aria-labelledby="labelA">
+          <ul id="listA" role="listbox" aria-label="City matches" hidden></ul>
+        </div>
+        <div class="meta" id="metaA"></div>
+        <details class="sched">
+          <summary>my sleep &amp; busy hours</summary>
+          <div class="sched-grid">
+            <span>asleep</span>
+            <input type="time" id="sleepStartA" step="900" value="23:00" aria-label="Your sleep starts">
+            <input type="time" id="sleepEndA" step="900" value="07:00" aria-label="Your sleep ends">
+            <span>busy</span>
+            <input type="time" id="busyStartA" step="900" value="09:00" aria-label="Your busy hours start">
+            <input type="time" id="busyEndA" step="900" value="18:00" aria-label="Your busy hours end">
+            <span>busy on</span>
+            <select id="busyDaysA" aria-label="Which days you are busy">
+              <option value="weekdays">weekdays</option>
+              <option value="everyday">every day</option>
+              <option value="weekends">weekends</option>
+              <option value="never">never</option>
+            </select>
+            <span></span>
+            <span class="sched-hint">same start and end = none at all</span>
+          </div>
+        </details>
+      </div>
+
+      <div class="swap">
+        <button id="swapBtn" type="button" aria-label="Swap the two cities" title="swap">⇄</button>
+      </div>
+
+      <div class="picker">
+        <div class="picker-label" id="labelB">Them</div>
+        <div class="combo" id="comboB">
+          <input type="text" id="cityB" placeholder="their city…" autocomplete="off" spellcheck="false"
+                 role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="listB" aria-labelledby="labelB">
+          <ul id="listB" role="listbox" aria-label="City matches" hidden></ul>
+        </div>
+        <div class="meta" id="metaB"></div>
+        <details class="sched">
+          <summary>their sleep &amp; busy hours</summary>
+          <div class="sched-grid">
+            <span>asleep</span>
+            <input type="time" id="sleepStartB" step="900" value="23:00" aria-label="Their sleep starts">
+            <input type="time" id="sleepEndB" step="900" value="07:00" aria-label="Their sleep ends">
+            <span>busy</span>
+            <input type="time" id="busyStartB" step="900" value="09:00" aria-label="Their busy hours start">
+            <input type="time" id="busyEndB" step="900" value="18:00" aria-label="Their busy hours end">
+            <span>busy on</span>
+            <select id="busyDaysB" aria-label="Which days they are busy">
+              <option value="weekdays">weekdays</option>
+              <option value="everyday">every day</option>
+              <option value="weekends">weekends</option>
+              <option value="never">never</option>
+            </select>
+            <span></span>
+            <span class="sched-hint">same start and end = none at all</span>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <section class="empty" id="empty">
+      <p>Start with your city. Then theirs.</p>
+      <div class="hintband" aria-hidden="true"></div>
+    </section>
+
+    <section id="result" hidden aria-label="Your overlap">
+      <p class="offset-line" id="offsetLine"></p>
+      <p class="verdict" aria-live="polite">You overlap for <b id="verdictNum"></b> a day.</p>
+      <p class="tier-line" id="tierLine"></p>
+
+      <div class="band" id="bandBox"></div>
+
+      <div class="windows" id="windowsBox"></div>
+
+      <p class="countdown" id="countdown" aria-live="off"></p>
+
+      <section class="meter" aria-label="Hours awake together">
+        <div class="meter-title"><span class="meter-dot" id="meterDot"></span>hours awake together</div>
+        <div class="meter-reading"><span id="meterNum">0</span><span class="meter-units"> h </span><span id="meterMin">00</span><span class="meter-units"> m</span></div>
+        <div class="meter-caption" id="meterSub"></div>
+        <div class="met-row">
+          <label for="metDate">we met on</label>
+          <input type="date" id="metDate">
+          <button id="meterReset" type="button">reset counter</button>
+        </div>
+      </section>
+
+      <div class="sharebar">
+        <button class="btn" id="btnSaveCard" type="button">Save the card</button>
+        <button class="btn ghost" id="btnCopyText" type="button">Copy as text</button>
+      </div>
+      <div id="cardPreviewBox" hidden>
+        <img id="cardPreview" alt="Your overlap card — save or send it">
+      </div>
+      <canvas id="shareCanvas" hidden aria-hidden="true"></canvas>
+    </section>
+  </main>
+</div>
+
+<footer>
+  <!-- Ad slot. To activate AdSense: replace the inner content of .slot with your
+       <ins class="adsbygoogle"> unit + script, keep the container. Until then it
+       renders as a quiet house line — never let it get louder than this. -->
+  <div class="slot" id="adSlot">Overlap is free and runs entirely in your browser. If it helped, send it to the person it's about.</div>
+  <div class="foot-lines">
+    <span>overlap.love · made for the distance</span>
+    <span>your cities, hours and counter never leave this device</span>
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script src="cities.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

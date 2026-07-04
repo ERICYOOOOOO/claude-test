@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>每日一法 · 每天读一条值得一读的法律</title>
+<meta name="description" content="每日一法：像单向历一样，每天呈现一条值得一读的法律条文。中国、美国、英国、德国、日本、法国、国际条约七轨，每轨每天一条，附编辑手记与出处。">
+<meta property="og:title" content="每日一法 · 每天读一条值得一读的法律">
+<meta property="og:description" content="七个法域，每天各一条。条文原文、出处、一段克制的编辑手记。">
+<meta property="og:type" content="website">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="top">
+  <div class="brand" aria-label="每日一法">每日一法</div>
+  <nav class="tracks" role="tablist" aria-label="法域轨道" id="trackTabs"></nav>
+  <button class="favs-toggle" id="btnFavsPanel" aria-expanded="false">收藏夹<span class="favs-count" id="favsCount" hidden></span></button>
+</header>
+
+<main class="stage">
+  <section class="leaf-wrap">
+    <article class="leaf" id="leaf" aria-live="polite">
+      <div class="binding" aria-hidden="true"><i></i><i></i></div>
+      <div class="daybar">
+        <span class="ym" id="ymLine"></span>
+        <span class="daytag" id="dayTag" hidden>昨日</span>
+        <button class="ghost" id="btnYesterday">看昨日</button>
+      </div>
+      <div class="datenum" id="dateNum" aria-hidden="true"></div>
+      <div class="weekday" id="weekday"></div>
+      <div class="rule" aria-hidden="true"></div>
+      <blockquote class="law" id="lawText"></blockquote>
+      <p class="origin" id="originLine" hidden></p>
+      <p class="cite" id="sourceLine"></p>
+      <div class="note-block">
+        <span class="note-label">编辑手记</span>
+        <p class="note" id="noteText"></p>
+      </div>
+      <div class="actions">
+        <button id="btnFav" aria-pressed="false">收藏</button>
+        <button id="btnCopy">复制引用</button>
+        <button id="btnShare">存图分享</button>
+      </div>
+    </article>
+  </section>
+
+  <section class="favs-panel" id="favsPanel" hidden>
+    <h2>收藏夹</h2>
+    <p class="favs-empty" id="favsEmpty">还没有收藏。点条文下方的「收藏」，把喜欢的法条留在这里。</p>
+    <ul class="favs-list" id="favsList"></ul>
+  </section>
+
+  <!-- 变现挂点：AdSense 激活时替换本块为 adsbygoogle 代码（保持 max-width 与配色，见 DEPLOY.md）。默认渲染为极简自推广位。 -->
+  <aside class="promo" id="promo">
+    <span class="promo-mark">推荐</span>
+    每天一页的仪式感，也可以送人——把今天这条法条转给一位学法律的朋友。
+  </aside>
+
+  <footer class="foot">
+    <p class="disclaimer">内容为科普节选，不构成法律意见；条文以官方最新版本为准。</p>
+    <p class="colophon">每日一法 · meiriyifa.app</p>
+  </footer>
+</main>
+
+<div class="modal" id="shareModal" hidden role="dialog" aria-modal="true" aria-label="分享卡">
+  <div class="modal-card">
+    <canvas id="shareCanvas" width="720" height="1200"></canvas>
+    <div class="modal-actions">
+      <a id="btnDownload" download="meiriyifa.png">下载 PNG</a>
+      <button id="btnCopyCard">复制文本版</button>
+      <button id="btnCloseModal">关闭</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script src="laws.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

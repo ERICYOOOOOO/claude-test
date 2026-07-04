@@ -191,11 +191,13 @@
   }
 
   /* Window naming: bucket each side's local hour at the window midpoint into
-   * M(orning 5–12) D(aytime 12–18) E(vening 18–22) N(ight 22–5), then look up. */
+   * M(orning 5–12) D(aytime 12–18) E(vening 18–21) N(ight 21–5), then look up.
+   * Night starts at 21 on purpose: a window that peaks at 21:30 is goodnight
+   * territory, not dinner. */
   function bucketGroup(h) {
     if (h >= 5 && h < 12) return "M";
     if (h >= 12 && h < 18) return "D";
-    if (h >= 18 && h < 22) return "E";
+    if (h >= 18 && h < 21) return "E";
     return "N";
   }
 
@@ -906,7 +908,7 @@
     ctx.fillText(cityLine, M, 208);
     ctx.font = "26px " + SANS;
     ctx.fillStyle = COLORS.dim;
-    ctx.fillText(fmtHM(localParts(d, S.a.z)) + " there · " + fmtHM(localParts(d, S.b.z)) + " there", M, 254);
+    ctx.fillText(fmtHM(localParts(d, S.a.z)) + " in " + S.a.n + " · " + fmtHM(localParts(d, S.b.z)) + " in " + S.b.n, M, 254);
 
     /* the number */
     var dur = fmtDur(S.day.overlapMinutes);
@@ -953,9 +955,9 @@
       var win = S.day.windows[i];
       var wx = px(win.i0);
       var ww = px(win.i1 + 1) - wx;
-      ctx.shadowColor = "rgba(255,233,184,0.9)";
-      ctx.shadowBlur = 34;
-      ctx.fillStyle = COLORS.glow;
+      ctx.shadowColor = "rgba(255,233,184,0.8)";
+      ctx.shadowBlur = 26;
+      ctx.fillStyle = "rgba(255,236,192,0.92)";
       roundRect(ctx, wx + 1, yA - 7, Math.max(3, ww - 2), yB + hT - yA + 14, 7);
       ctx.fill();
       ctx.shadowBlur = 0;
@@ -1149,6 +1151,18 @@
     $("btnCopyText").addEventListener("click", function () {
       if (!S.day) return;
       copyText(buildShareText());
+    });
+
+    window.addEventListener("hashchange", function () {
+      var pair = readHash();
+      if (pair) {
+        S.a = pair.a;
+        S.b = pair.b;
+        $("cityA").value = S.a.n;
+        $("cityB").value = S.b.n;
+        saveLast();
+        refreshPair();
+      }
     });
 
     window.addEventListener("pagehide", saveMeter);
