@@ -21,6 +21,7 @@
   - 不存在的日期（2 月 30）→ `That date doesn't exist. Check the month against the day.`
   - 未来日期 → `You appear not to have been born yet. Come back once that's sorted.`
   - 1900 之前 → `This machine calibrates back to 1900. If you were really born before that, you've outlasted everyone in here — congratulations.`
+  - 未满 13 岁 → `This machine starts measuring at 13. Until then you're not behind — everyone in here is simply older than you.`（不对未成年人展示对比判词）
 
 ### 屏 1 · 判词（result）
 自上而下的报纸版式：

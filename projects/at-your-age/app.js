@@ -62,6 +62,11 @@
     if (Date.UTC(y, m - 1, d) > Date.UTC(t.y, t.m - 1, t.d)) {
       return { err: "You appear not to have been born yet. Come back once that's sorted." };
     }
+    // Under-13: the ledger is not for children. Kind, no roasting minors.
+    var age = t.y - y - ((t.m < m || (t.m === m && t.d < d)) ? 1 : 0);
+    if (age < 13) {
+      return { err: "This machine starts measuring at 13. Until then you're not behind — everyone in here is simply older than you." };
+    }
     var pad = function (n) { return (n < 10 ? "0" : "") + n; };
     return { y: y, m: m, d: d, iso: y + "-" + pad(m) + "-" + pad(d) };
   }
@@ -499,6 +504,11 @@
     cardDataURL: function () { return drawCard().toDataURL("image/png"); },
     getMode: function () { return mode; },
     getCurrent: function () { return current; },
-    dataCount: DATA.length
+    dataCount: DATA.length,
+    // pure functions exposed for the QA harness (test/qa-extra.mjs)
+    verdictFor: verdictFor,
+    formatSpan: formatSpan,
+    ageParts: ageParts,
+    validateBirth: validateBirth
   };
 })();
