@@ -47,7 +47,7 @@
       ans: function (p) { return p.region === "europe"; } },
     { id: "g4", cat: "geo", text: "TA 来自美洲吗？",
       ans: function (p) { return p.region === "namerica" || p.region === "samerica"; } },
-    { id: "g5", cat: "geo", text: "TA 是美国人吗？",
+    { id: "g5", cat: "geo", text: "TA 来自美国吗？",
       ans: function (p) { return p.country === "美国"; } },
     { id: "g6", cat: "geo", text: "TA 是英国人吗？",
       ans: function (p) { return p.country === "英国"; } },

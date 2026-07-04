@@ -59,7 +59,7 @@
 | g2 | TA 来自亚洲吗？ | `region === "asia"` |
 | g3 | TA 来自欧洲吗？ | `region === "europe"` |
 | g4 | TA 来自美洲吗？ | `region === "namerica" || region === "samerica"` |
-| g5 | TA 是美国人吗？ | `country === "美国"` |
+| g5 | TA 来自美国吗？ | `country === "美国"`（"来自"而非"是美国人"，避免爱因斯坦、特斯拉等入籍美国者产生歧义） |
 | g6 | TA 是英国人吗？ | `country === "英国"` |
 | g7 | TA 来自法国或德国吗？ | `country ∈ {法国, 德国}` |
 | g8 | TA 来自非洲或大洋洲吗？ | `region ∈ {africa, oceania}` |
