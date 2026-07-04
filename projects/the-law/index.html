@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>今日之律 The Law — 每日归纳推理谜题</title>
+<meta name="description" content="每天全球一条隐藏法则，作用于 1–20 的数字三元组。提交实验换取 ✓ 或 ✗，归纳出规律，再接受 8 题终审。用的实验越少，越体面。致敬 Wason 2-4-6 与 Zendo 的每日归纳推理谜题。">
+<meta property="og:title" content="今日之律 The Law">
+<meta property="og:description" content="每天全球同一条隐藏法则。做实验，破解它，晒零剧透战报。">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2032%2032'%3E%3Crect%20x='3'%20y='3'%20width='26'%20height='26'%20fill='none'%20stroke='%23b3282d'%20stroke-width='3'/%3E%3Ctext%20x='16'%20y='23'%20font-size='17'%20text-anchor='middle'%20fill='%23b3282d'%20font-family='serif'%20font-weight='bold'%3E%E5%BE%8B%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="sheet">
+
+  <header class="masthead">
+    <div class="brand">
+      <span class="brand-zh">今日之律</span>
+      <span class="brand-en">THE LAW</span>
+    </div>
+    <div class="mast-meta"><span id="streakBox">连胜 0</span></div>
+  </header>
+
+  <div id="newDayBar" class="banner" hidden>
+    <span>新一期卷宗已送达。</span>
+    <button id="reloadBtn" class="btn small" type="button">换刊</button>
+  </div>
+
+  <div id="practiceBar" class="banner practice" hidden>
+    <span id="practiceLabel">练习 · 不计连胜</span>
+    <button id="exitPracticeBtn" class="btn small" type="button">返回今日</button>
+  </div>
+
+  <section class="dossier" id="dossierHead">
+    <div class="dossier-top">
+      <span class="file-no mono" id="fileNo">№ 0000</span>
+      <span class="file-date mono" id="fileDate"></span>
+      <span class="file-diff" id="fileDiff" aria-label="难度"></span>
+    </div>
+    <p class="law-line">本期法则：<span id="lawText" class="redacted">████████████████</span></p>
+  </section>
+
+  <section id="labSec">
+    <div class="bench" id="bench">
+      <div class="trio" role="group" aria-label="构造三元组，每个数 1 到 20">
+        <div class="cell">
+          <button class="step" type="button" data-idx="0" data-d="1" aria-label="第一个数加一">▲</button>
+          <input class="num mono" id="num0" value="2" inputmode="numeric" autocomplete="off" aria-label="第一个数，1 到 20">
+          <button class="step" type="button" data-idx="0" data-d="-1" aria-label="第一个数减一">▼</button>
+        </div>
+        <span class="sep" aria-hidden="true">·</span>
+        <div class="cell">
+          <button class="step" type="button" data-idx="1" data-d="1" aria-label="第二个数加一">▲</button>
+          <input class="num mono" id="num1" value="4" inputmode="numeric" autocomplete="off" aria-label="第二个数，1 到 20">
+          <button class="step" type="button" data-idx="1" data-d="-1" aria-label="第二个数减一">▼</button>
+        </div>
+        <span class="sep" aria-hidden="true">·</span>
+        <div class="cell">
+          <button class="step" type="button" data-idx="2" data-d="1" aria-label="第三个数加一">▲</button>
+          <input class="num mono" id="num2" value="6" inputmode="numeric" autocomplete="off" aria-label="第三个数，1 到 20">
+          <button class="step" type="button" data-idx="2" data-d="-1" aria-label="第三个数减一">▼</button>
+        </div>
+      </div>
+      <div class="bench-actions">
+        <button id="submitBtn" class="btn primary" type="button">提交实验</button>
+        <button id="finalBtn" class="btn" type="button">参加终审</button>
+      </div>
+      <p class="hint" id="hint">例：先提交 2 · 4 · 6——档案会盖章告诉你它合不合法。</p>
+      <p class="note" id="benchNote" aria-live="polite"></p>
+    </div>
+
+    <div id="confirmBox" class="confirm" hidden>
+      <p>终审共 8 题：由你裁定每个样本是否合法。开始后不能再回来做实验。</p>
+      <p class="confirm-zero" id="confirmZero" hidden>你还没做过任何实验。</p>
+      <div class="confirm-actions">
+        <button id="confirmGo" class="btn primary" type="button">开始终审</button>
+        <button id="confirmBack" class="btn" type="button">再想想</button>
+      </div>
+    </div>
+
+    <div class="ledger-wrap">
+      <table class="ledger">
+        <caption class="visually-hidden">实验台账</caption>
+        <thead><tr><th scope="col">序号</th><th scope="col">样本</th><th scope="col">判定</th></tr></thead>
+        <tbody id="ledgerBody"></tbody>
+      </table>
+      <p class="empty" id="ledgerEmpty">尚无实验记录。</p>
+    </div>
+  </section>
+
+  <section id="examSec" hidden>
+    <div class="exam-head">
+      <span class="exam-title">终 审</span>
+      <span class="exam-progress">第 <b id="qNum">1</b> / 8 题</span>
+    </div>
+    <div class="exam-dots" id="examDots" aria-hidden="true"></div>
+    <div class="exam-card" id="examCard">
+      <div class="exam-triple mono" id="examTriple"></div>
+      <div class="exam-stamp-slot" id="examStampSlot"></div>
+    </div>
+    <div class="exam-actions">
+      <button id="voteOk" class="judge ok" type="button">✓ 合法</button>
+      <button id="voteNo" class="judge no" type="button">✗ 非法</button>
+    </div>
+    <p class="exam-feedback" id="examFeedback" aria-live="polite"></p>
+  </section>
+
+  <section id="resultSec" hidden>
+    <div class="verdict-zone">
+      <div class="big-stamp" id="bigStamp">CRACKED</div>
+      <p class="verdict-sub" id="verdictSub"></p>
+    </div>
+    <p class="law-reveal">今日法则：<b id="lawReveal"></b></p>
+    <p class="result-stats mono" id="resultStats"></p>
+    <div class="share">
+      <pre class="share-text mono" id="shareTextEl"></pre>
+      <div class="share-actions">
+        <button id="copyBtn" class="btn primary" type="button">复制战报</button>
+        <button id="pngBtn" class="btn" type="button">保存图卡</button>
+      </div>
+      <p class="note" id="shareNote" aria-live="polite"></p>
+      <canvas id="shareCanvas" width="1400" height="1840" aria-label="战报图卡预览"></canvas>
+    </div>
+    <p class="countdown mono" id="countdown"></p>
+    <div class="result-links">
+      <button id="archiveBtn" class="btn" type="button">往期档案</button>
+    </div>
+    <aside class="promo">
+      <!-- 变现挂点（AdSense）：
+           1) 在 <head> 引入 adsbygoogle.js 并填入你的 client id；
+           2) 用 <ins class="adsbygoogle"> 广告单元替换本 aside 内部内容；
+           3) 保留 class="promo" 外壳以维持卷宗样式。
+           未接入时默认渲染下面的极简自推广位。 -->
+      <p class="promo-kicker">自推广</p>
+      <p>喜欢这类归纳谜题？把 thelaw.day 发给一个自认聪明的朋友。</p>
+    </aside>
+  </section>
+
+  <section id="archiveSec" hidden>
+    <div class="archive-head">
+      <h2>往期档案</h2>
+      <button id="archiveBack" class="btn small" type="button">返回</button>
+    </div>
+    <p class="archive-tip">练习不计连胜。</p>
+    <ul class="archive-list" id="archiveList"></ul>
+  </section>
+
+  <footer class="foot">
+    <span class="mono">thelaw.day</span>
+    <span>每日 0 点换刊 · 全球同题</span>
+  </footer>
+
+</div>
+<script src="app.js"></script>
+</body>
+</html>
