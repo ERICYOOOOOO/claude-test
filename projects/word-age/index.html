@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en" data-site="https://wordage.fyi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Word Age — how old is that English word, really?</title>
+<meta name="description" content="Type any English word and get its birth certificate: first recorded year, its real age, what it meant back then, and how far it drifted. 500+ words, every fact checked.">
+<link rel="canonical" href="https://wordage.fyi/">
+<meta property="og:title" content="Word Age — every word has a birthday">
+<meta property="og:description" content="nice meant foolish. meat meant all food. girl meant any child. Look up the birth year and original meaning of 500+ English words.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://wordage.fyi/">
+<meta property="og:site_name" content="Word Age">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23f7f2e7'/%3E%3Ctext x='16' y='23' font-family='Georgia' font-size='20' font-style='italic' text-anchor='middle' fill='%2317130e'%3EW%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="sheet">
+
+<header class="masthead">
+  <hr class="rule"><hr class="rule thin">
+  <h1 class="brand">Word Age</h1>
+  <p class="tagline">Every word has a birthday. Most are not what you expect.</p>
+  <hr class="rule foot">
+</header>
+
+<main>
+  <section class="lookup" aria-label="Look up a word">
+    <label class="label" for="q">Look up a word</label>
+    <input id="q" type="text" autocomplete="off" autocapitalize="none" spellcheck="false"
+           placeholder="Type an English word — try “nice”" autofocus
+           role="combobox" aria-expanded="false" aria-controls="sugg">
+    <ul id="sugg" class="sugg" role="listbox" hidden></ul>
+    <div class="chips">
+      <span class="label">or try</span>
+      <button class="chip" data-w="nice">nice</button>
+      <button class="chip" data-w="silly">silly</button>
+      <button class="chip" data-w="girl">girl</button>
+      <button class="chip" data-w="fun">fun</button>
+      <button class="chip" data-w="meat">meat</button>
+      <button class="chip" data-w="clue">clue</button>
+      <a id="random" class="chip" href="#random">a random entry</a>
+    </div>
+  </section>
+
+  <section id="notfound" class="notfound" hidden>
+    <p>“<span id="nf-q"></span>” is not in the archive yet. Closest entries:</p>
+    <div id="nf-sugg" class="chips"></div>
+  </section>
+
+  <section id="result" class="entry" hidden aria-live="polite">
+    <div class="headword-row">
+      <h2 id="r-word" class="headword"></h2>
+      <span id="r-stamp" class="stamp"></span>
+    </div>
+    <div class="yearblock">
+      <span class="label">First recorded</span>
+      <div id="r-year" class="year"></div>
+      <p id="r-age" class="ageline"></p>
+    </div>
+    <section class="orig">
+      <span class="label">As first written</span>
+      <p id="r-orig"></p>
+    </section>
+    <section class="drift">
+      <span class="label">How it drifted</span>
+      <p id="r-shift"></p>
+    </section>
+    <section class="persp">
+      <span class="label">For perspective</span>
+      <p id="r-persp"></p>
+    </section>
+    <div class="actions">
+      <button id="save-card" class="btn">Save birth certificate</button>
+      <button id="copy-text" class="btn ghost">Copy as text</button>
+      <a id="r-perma" class="btn ghost" href="#">Permanent page →</a>
+      <span id="toast" class="toast" role="status"></span>
+    </div>
+    <div class="seealso">
+      <span class="label">See also</span>
+      <ul id="r-related"></ul>
+    </div>
+  </section>
+
+  <section class="wotd">
+    <span class="label">Word of the day · <span id="wotd-date"></span></span>
+    <p id="wotd-word" class="word"></p>
+    <p id="wotd-meta" class="meta"></p>
+  </section>
+
+  <section id="recent" class="wotd" hidden>
+    <span class="label">Recently looked up</span>
+    <div id="recent-chips" class="chips"></div>
+  </section>
+
+  <section class="method">
+    <span class="label">Method</span>
+    <p>Dates follow the standard etymological references (the conventions of the OED and Etymonline). “c.” means circa; “Old English” means before about 1150 — we do not invent precision the record doesn’t have.</p>
+    <p>Words with uncertain histories are either flagged as such or left out. If a story sounds too good to be true (NEWS is not an acronym; “sincere” has no wax in it), we say so.</p>
+  </section>
+
+  <!-- Ad slot. To activate AdSense: replace the inner markup with your ad unit
+       snippet per DEPLOY.md §Monetization. Until then it stays a quiet house ad. -->
+  <aside class="ad" aria-label="sponsor">
+    <span class="label">A word from the press</span>
+    <p>Word Age is free and carries no tracking. Save a certificate, send it to the friend who says “nice” too much.</p>
+  </aside>
+</main>
+
+<footer class="colophon">
+  <div class="inner">
+    <span>Word Age — the archive of word birthdays.</span>
+    <span><a href="words/index.html">Browse the full catalogue</a></span>
+    <span>wordage.fyi</span>
+  </div>
+</footer>
+
+</div>
+<script src="data.js"></script>
+<script src="lib.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
