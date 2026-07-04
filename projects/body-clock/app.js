@@ -221,13 +221,26 @@
     el.needle.style.transform = 'rotate(' + deg + 'deg)';
   }
 
+  function updateDialWord() {
+    el.dialWord.textContent = phase === 'holding' ? '……'
+      : (mode === 'daily' && !canPlayDaily()) ? '已锁定'
+      : '按住';
+  }
+
+  function scrollIntoViewSoft(node) {
+    try {
+      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      node.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'nearest' });
+    } catch (e) {}
+  }
+
   function setPhase(p) {
     phase = p;
     el.resultPanel.hidden = p !== 'reveal';
     el.summaryPanel.hidden = p !== 'summary';
     el.dial.classList.toggle('holding', p === 'holding');
     el.dial.classList.toggle('distort', p === 'holding' && distortionOn());
-    el.dialWord.textContent = p === 'holding' ? '……' : '按住';
+    updateDialWord();
     if (p !== 'summary' && countdownTimer) { clearInterval(countdownTimer); countdownTimer = null; }
   }
 
@@ -236,6 +249,7 @@
     renderTarget();
     renderAttempts();
     renderHint();
+    updateDialWord();
     el.tabDaily.classList.toggle('active', mode === 'daily');
     el.tabDaily.setAttribute('aria-selected', mode === 'daily');
     el.tabPractice.classList.toggle('active', mode === 'practice');
@@ -345,6 +359,7 @@
     void el.resultPanel.offsetWidth;
     el.resultPanel.classList.add('reveal');
     setPhase('reveal');
+    scrollIntoViewSoft(el.resultPanel); // 揭晓瞬间必须在视野内
   }
 
   /* ================= 当日结算 ================= */
@@ -371,6 +386,7 @@
 
     setPhase('summary');
     startCountdown();
+    scrollIntoViewSoft(el.summaryPanel);
   }
 
   function startCountdown() {
@@ -491,11 +507,13 @@
     ctx.fillText('误 差  D E V I A T I O N', 500, 850);
     ctx.fillStyle = '#ffffff';
     ctx.font = '700 168px ' + FONT;
-    ctx.fillText(best ? core.formatSec(best.errMs, 3) : '-', 470, 1000);
+    var errStr = best ? core.formatSec(best.errMs, 3) : '-';
+    var errW = ctx.measureText(errStr).width;
+    ctx.fillText(errStr, 480, 1000);
     ctx.fillStyle = '#94969c';
     ctx.font = '400 44px ' + FONT;
     ctx.textAlign = 'left';
-    ctx.fillText('s', 830, 1000);
+    ctx.fillText('s', 480 + errW / 2 + 18, 1000);
 
     // 称号
     var tier = core.gradeError(best ? best.errMs : 99999);
