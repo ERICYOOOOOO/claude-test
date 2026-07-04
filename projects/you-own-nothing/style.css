@@ -77,12 +77,29 @@ body {
 }
 
 .odometer {
+  position: relative;
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   font-size: 27.5px;
   font-weight: 700;
   line-height: 1;
   color: var(--ink);
   margin-top: 4px;
+  display: inline-flex;
+  align-items: flex-start;
+}
+
+/* the live region reads one clean amount; the strips are visual only */
+.odo-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.odo-visual {
   display: inline-flex;
   align-items: flex-start;
 }
@@ -123,7 +140,9 @@ body {
   border: none;
   border-bottom: 2px solid var(--mustard);
   cursor: pointer;
-  padding: 1px 2px;
+  /* visually a slim underlined link; the tap area is honest */
+  padding: 13px 2px;
+  margin: -12px 0;
 }
 .leave-btn:hover { background: rgba(217, 164, 65, 0.25); }
 
@@ -156,6 +175,9 @@ body {
 
 .obj { cursor: pointer; outline: none; }
 .obj .hit { fill: transparent; stroke: none; }
+
+/* price chips are labels, not targets — clicks fall through to the object */
+#chips { pointer-events: none; }
 
 .obj {
   transform-box: fill-box;
@@ -346,10 +368,10 @@ body {
 
 .m-close {
   position: absolute;
-  top: 12px;
-  right: 12px;
-  width: 32px;
-  height: 32px;
+  top: 6px;
+  right: 6px;
+  width: 44px;
+  height: 44px;
   border: none;
   background: none;
   color: var(--saas-faint);
@@ -434,6 +456,10 @@ body {
   font-size: 11px;
   text-decoration: underline;
   cursor: pointer;
+  /* looks like fine print, taps like a button */
+  padding: 14px 6px;
+  margin-top: -12px;
+  margin-bottom: -12px;
 }
 
 .m-tiers { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 14px; }
@@ -505,6 +531,7 @@ body {
 .m-cta {
   display: block;
   width: 100%;
+  min-height: 44px;
   background: var(--saas-blue);
   color: #fff;
   border: none;
@@ -530,16 +557,18 @@ body {
   font-size: 13px;
   color: var(--saas-gray);
   cursor: pointer;
-  padding: 6px 10px;
+  min-height: 44px;
+  padding: 6px 12px;
   border-radius: 6px;
 }
 .m-decline:hover { text-decoration: underline; color: #374151; }
 
-/* dark pattern B: the decline button, humiliated */
+/* dark pattern B: the decline button, humiliated.
+   it must LOOK 11px — the touch target stays honest via invisible padding */
 .m-decline.rot {
   font-size: 11px;
   color: #b8bcc4;
-  padding: 2px 4px;
+  padding: 6px 12px;
 }
 .m-decline.rot:hover { color: #9ca3af; }
 
@@ -644,6 +673,7 @@ body {
 .checkout-actions button {
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   font-size: 12.5px;
+  min-height: 44px;
   padding: 11px 16px;
   background: transparent;
   color: #e8ddca;
@@ -703,7 +733,8 @@ body {
   border: none;
   cursor: pointer;
   border-bottom: 2px solid var(--mustard);
-  padding-bottom: 1px;
+  padding: 13px 0 1px;
+  margin-top: -13px;
 }
 .toast button:hover { color: #e4b356; }
 

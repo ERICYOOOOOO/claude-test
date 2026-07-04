@@ -886,7 +886,9 @@
     el.issueTag.textContent = '#' + issueOf(day);
     el.beatCounter.textContent = '待机';
     el.phaseLabel.textContent = 'IDLE';
-    if (store.streak > 0) {
+    // 漏一天连胜即断（lastDay 不是今天也不是昨天 → 不再展示已死的连胜）
+    const streakAlive = store.lastDay === day || store.lastDay === day - 1;
+    if (streakAlive && store.streak > 0) {
       el.streakLine.hidden = false;
       el.streakLine.textContent = '已连稳 ' + store.streak + ' 天 · 最佳 ' + store.bestStreak;
     } else el.streakLine.hidden = true;
@@ -914,6 +916,7 @@
   }
 
   // ---------------------------------------------------------------- countdown
+  let cdDay = todayIdx();
   function tickCountdown() {
     const now = new Date();
     const next = new Date(now);
@@ -922,6 +925,11 @@
     const t = pad2(Math.floor(s / 3600)) + ':' + pad2(Math.floor((s % 3600) / 60)) + ':' + pad2(s % 60);
     el.countdown.textContent = t;
     el.countdown2.textContent = t;
+    const day = todayIdx();
+    if (day !== cdDay) {              // 跨午夜：待机中的开始屏自动换到新一期
+      cdDay = day;
+      if (S.screen === 'start') renderStart();
+    }
   }
 
   // ---------------------------------------------------------------- main loop
@@ -1027,6 +1035,7 @@
       S.stripW = el.cueTap.querySelector('.tap-strip').getBoundingClientRect().width;
     }
     if (S.screen === 'result' && S.lastResult) drawResultCanvas(S.lastResult);
+    if (S.screen === 'start' && !el.startDone.hidden) renderStart(); // 迷你波形重绘
   });
 
   // ---------------------------------------------------------------- test hook（冒烟测试用，不影响玩法）
@@ -1068,6 +1077,11 @@
       return res ? buildShareText(res) : '';
     },
     lastCopied() { return lastShareText; },
+    defsPreview() { // 只读：当日拍序指纹（类型+参数），供确定性/换题测试
+      return genDefs(todayIdx()).map((d) =>
+        d.type + (d.type === 'TAP' ? '@' + d.frac.toFixed(3) : d.type === 'HOLD' ? '@' + d.hold : '')
+      ).join(' ');
+    },
     exportPNG() {
       const res = S.lastResult || store.lastResult;
       return res ? buildShareCanvas(res).toDataURL('image/png') : '';

@@ -64,7 +64,7 @@ var W = [
 ["nostril",900,"Old English","nose-hole — nosu + þyrel “hole”","Old English nosþyrl is transparently “nose-thirl,” thirl being a hole. The word for hole died; its fossil lives on in your face.","o"],
 ["sock",900,"Old English","a light slipper","Old English socc was a soft low shoe, from Latin soccus — the slipper worn by comic actors on the Roman stage.","o"],
 ["friend",900,"Old English","one who loves — literally “loving one”","Old English frēond is the present participle of frēogan “to love”: a friend is, grammatically, someone busy loving you.","o"],
-["fiend",900,"Old English","an enemy — literally “hating one”","Old English fēond is the participle of fēon “to hate” — friend’s exact grammatical twin. The Enemy (the Devil) made it demonic.","o"],
+["fiend",900,"Old English","an enemy — literally “hating one”","Old English fēond is the participle of fēogan “to hate” — friend’s exact grammatical twin. The Enemy (the Devil) made it demonic.","o"],
 ["world",900,"Old English","the age of man; human existence","Old English weorold compounds wer “man” + eld “age”: literally “man-age,” the span of human life. Time hardened into place.","o"],
 ["business",900,"Old English","anxiety, care; the state of being busy","Old English bisignes meant busyness and unease. It took centuries to calm down into commerce.","o"],
 ["ghost",900,"Old English","breath; the soul, the spirit of life","Old English gāst was breath and soul — the Holy Ghost keeps the old sense. The haunting specter is the junior meaning.","o"],

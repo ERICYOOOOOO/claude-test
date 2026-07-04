@@ -633,7 +633,9 @@ function initUI() {
     els.examFeedback.textContent = right ? '判对。' : '判错。';
     els.examFeedback.className = 'exam-feedback ' + (right ? 'good' : 'bad');
     renderExamDots();
+    var sess = session;   /* 换题窗口内若退出练习（session 切换），该定时器作废 */
     setTimeout(function () {
+      if (session !== sess || session.phase !== 'exam') return;
       if (session.answers.length >= EXAM_SIZE) {
         session.phase = 'done';
         settleOnce();
@@ -799,6 +801,7 @@ function initUI() {
     ctx.fillText('实 验 轨 迹', 84, 186);
     var n = data.traj.length;
     var gridTop = 204, gridLeft = 84;
+    var gridBottom = gridTop + 60;
     if (n === 0) {
       ctx.fillStyle = INK;
       ctx.font = '18px Georgia, "Songti SC", serif';
@@ -818,9 +821,10 @@ function initUI() {
         ctx.fillText(data.traj[q] ? '✓' : '✗', cx + cell / 2, cy + cell * 0.72);
         ctx.textAlign = 'left';
       }
+      gridBottom = gridTop + rows * (cell + gap);
     }
-    /* 判决大戳 */
-    var stampY = 660;
+    /* 判决大戳：在轨迹区与战绩行之间取平衡位，轨迹短时不留大片空白 */
+    var stampY = Math.min(660, Math.round((gridBottom + 750) / 2));
     ctx.save();
     ctx.translate(W / 2, stampY);
     ctx.rotate(-8 * Math.PI / 180);

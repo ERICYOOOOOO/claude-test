@@ -293,11 +293,24 @@
     var str = money(value);
     var container = els.odometer;
     container.setAttribute('data-value', str);
-    container.setAttribute('aria-label', 'Monthly total ' + str);
+    // screen readers get one clean string; the digit strips are decoration
+    var sr = container.querySelector('.odo-sr');
+    var visual = container.querySelector('.odo-visual');
+    if (!sr) {
+      container.textContent = '';
+      sr = document.createElement('span');
+      sr.className = 'odo-sr';
+      container.appendChild(sr);
+      visual = document.createElement('span');
+      visual.className = 'odo-visual';
+      visual.setAttribute('aria-hidden', 'true');
+      container.appendChild(visual);
+    }
+    sr.textContent = str;
     var mustRebuild = instant || RM || !odoChars || odoChars.length !== str.length;
 
     if (mustRebuild) {
-      container.textContent = '';
+      visual.textContent = '';
       odoChars = [];
       for (var i = 0; i < str.length; i++) {
         var ch = str[i];
@@ -314,7 +327,7 @@
           }
           strip.style.transform = 'translateY(' + (-Number(ch)) + 'em)';
           oc.appendChild(strip);
-          container.appendChild(oc);
+          visual.appendChild(oc);
           odoChars.push({ digit: true, strip: strip });
           // re-enable the transition after layout so future changes roll
           (function (el) {
@@ -326,7 +339,7 @@
           var sym = document.createElement('span');
           sym.className = 'osym';
           sym.textContent = ch;
-          container.appendChild(sym);
+          visual.appendChild(sym);
           odoChars.push({ digit: false });
         }
       }
@@ -648,9 +661,26 @@
   });
 
   document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape' && activeModal) {
+    if (!activeModal) return;
+    if (e.key === 'Escape') {
       e.preventDefault();
       closeModal();
+      return;
+    }
+    // aria-modal promises the backdrop is inert; keep the tab order inside
+    if (e.key === 'Tab') {
+      var focusables = els.modal.querySelectorAll('button, input, [tabindex]:not([tabindex="-1"])');
+      if (!focusables.length) return;
+      var first = focusables[0];
+      var last = focusables[focusables.length - 1];
+      var inside = els.modal.contains(document.activeElement);
+      if (e.shiftKey && (!inside || document.activeElement === first)) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && (!inside || document.activeElement === last)) {
+        e.preventDefault();
+        first.focus();
+      }
     }
   });
 
