@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>体内时钟 · 每日掐秒</title>
+<meta name="description" content="屏幕给一个目标秒数，按住、心里数、松开——看你的体内时钟差了多少毫秒。每日一题，全球同题，三次机会。">
+<meta property="og:title" content="体内时钟 Body Clock">
+<meta property="og:description" content="按住，心里数，松开。你的体内时钟差了多少毫秒？每日一题，三次机会。">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#2b2d31">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='15' fill='%23e9e7e2'/%3E%3Cline x1='16' y1='16' x2='16' y2='4' stroke='%23c8372d' stroke-width='2.5'/%3E%3Ccircle cx='16' cy='16' r='2.4' fill='%232b2d31'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="masthead">
+  <div class="brand-row">
+    <h1 class="brand">体内时钟 <span class="brand-latin">BODY CLOCK</span></h1>
+    <button id="btn-settings" class="icon-btn" aria-label="设置" aria-haspopup="dialog">⚙</button>
+  </div>
+  <div class="meta-row">
+    <span class="issue">第 <span id="issue-no" class="num">–</span> 期 · <span id="issue-date" class="num">–</span></span>
+    <span class="streak" id="streak-line" hidden>守时连胜 <b id="streak-n" class="num">0</b> 天</span>
+  </div>
+  <nav class="modes" role="tablist" aria-label="模式">
+    <button id="tab-daily" class="mode-tab active" role="tab" aria-selected="true">每日挑战</button>
+    <button id="tab-practice" class="mode-tab" role="tab" aria-selected="false">练习</button>
+  </nav>
+</header>
+
+<main>
+  <!-- ============ 表盘 ============ -->
+  <section class="dial-card" id="dial-card">
+    <div class="target-block">
+      <span class="target-label">目标 TARGET</span>
+      <div class="target-value"><b id="target-sec" class="num">–.––</b><span class="unit">s</span></div>
+      <span id="distortion-flag" class="distortion-flag" hidden>干扰模式 ★</span>
+    </div>
+
+    <div class="attempts" id="attempts-row" aria-label="今日三次机会">
+      <!-- app.js 填充：Ⅰ Ⅱ Ⅲ 三格 -->
+    </div>
+
+    <div id="dial" class="dial" role="button" tabindex="0"
+         aria-label="按住开始计时，心里默数到目标秒数后松开">
+      <div class="drift" aria-hidden="true"></div>
+      <svg viewBox="0 0 240 240" aria-hidden="true">
+        <circle class="face" cx="120" cy="120" r="112"/>
+        <g id="ticks"></g>
+        <circle class="pulse" cx="120" cy="120" r="96"/>
+        <g id="needle" class="needle">
+          <line x1="120" y1="120" x2="120" y2="26"/>
+          <line class="tail" x1="120" y1="120" x2="120" y2="146"/>
+        </g>
+        <circle class="hub" cx="120" cy="120" r="5"/>
+        <circle class="hub-dot" cx="120" cy="120" r="1.8"/>
+      </svg>
+      <div class="dial-word" id="dial-word">按住</div>
+    </div>
+    <p class="dial-hint" id="dial-hint">按住表盘，心里数到目标秒数，松开</p>
+  </section>
+
+  <!-- ============ 单次结果 ============ -->
+  <section class="panel" id="result-panel" hidden aria-live="polite">
+    <div class="panel-head">
+      <span id="result-attempt-label" class="micro">第 – 次</span>
+      <span id="result-mode-label" class="micro"></span>
+    </div>
+    <div class="result-rows num">
+      <div class="rr"><span>目标</span><b id="r-target">–</b></div>
+      <div class="rr"><span>你按了</span><b id="r-held">–</b></div>
+    </div>
+    <div class="err-block">
+      <span class="err-label">误差 DEVIATION</span>
+      <div class="err-value" id="err-value"><b id="r-err" class="num">–</b><span class="unit">s</span></div>
+      <div class="err-dir micro" id="r-dir">–</div>
+    </div>
+    <div class="tier-line" id="tier-line"><span id="r-tier-mark"></span><b id="r-tier"></b><span id="r-star" hidden>★</span></div>
+    <div class="panel-actions">
+      <button id="btn-next" class="btn primary">下一次</button>
+    </div>
+  </section>
+
+  <!-- ============ 当日结算 ============ -->
+  <section class="panel" id="summary-panel" hidden>
+    <div class="panel-head">
+      <span class="micro">今日结算 · 取最好一次</span>
+      <span class="micro num" id="s-issue"></span>
+    </div>
+    <div class="summary-best">
+      <div class="err-value"><b id="s-err" class="num">–</b><span class="unit">s</span></div>
+      <div class="tier-line"><span id="s-tier-mark"></span><b id="s-tier"></b><span id="s-star" hidden>★</span></div>
+    </div>
+    <div class="summary-squares num" id="s-squares"></div>
+    <div class="summary-streak micro" id="s-streak"></div>
+
+    <div class="share-row">
+      <button id="btn-copy" class="btn">复制战报</button>
+      <button id="btn-png" class="btn">保存图片</button>
+    </div>
+
+    <!-- 激励视频挂点 1：再来一次机会（占位，正式接入见 app.js showRewardedAd 注释） -->
+    <div class="reward-row">
+      <button id="btn-ad-retry" class="btn ghost">▶ 看视频 · 再来一次机会</button>
+      <!-- 激励视频挂点 2：解锁干扰模式★成绩 -->
+      <button id="btn-ad-distortion" class="btn ghost">▶ 看视频 · 解锁干扰模式 ★</button>
+    </div>
+
+    <div class="tomorrow micro">下一期 <span id="countdown" class="num">--:--:--</span> 后揭晓</div>
+
+    <!-- 广告位：默认自推广。接 AdSense 时把 aside 内容换成广告代码块，
+         尺寸建议 300×100（结果页下方，勿加动画）。审核通过前保持自推广样式。 -->
+    <aside class="ad-slot" aria-label="推广位">
+      <span class="micro">明天换一道题 · 把连胜守住</span>
+    </aside>
+  </section>
+</main>
+
+<footer class="foot">
+  <span>误差以毫秒计 · 数据只存在本机</span>
+  <span class="num">bodyclock.fun</span>
+</footer>
+
+<!-- ============ 设置 ============ -->
+<div class="modal-backdrop" id="settings-modal" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+    <div class="modal-head"><h2 id="settings-title">设置</h2><button class="icon-btn" id="btn-settings-close" aria-label="关闭">×</button></div>
+    <label class="setting-row">
+      <span>干扰模式 <b class="star">★</b><small>按住时播放不规则轻响并缓慢变色，破坏默数节奏。开启后称号带 ★。</small></span>
+      <button id="toggle-distortion" class="switch" role="switch" aria-checked="false"><i></i></button>
+    </label>
+    <label class="setting-row">
+      <span>声音<small>按下与松开的机械轻响。</small></span>
+      <button id="toggle-sound" class="switch" role="switch" aria-checked="true"><i></i></button>
+    </label>
+    <p class="micro rules">每日一题，全球同题。正式 3 次，取最好。误差 ≤0.2s 算守时，连着守就是连胜。练习不限次、不计入。</p>
+  </div>
+</div>
+
+<!-- ============ 激励视频占位 ============ -->
+<div class="modal-backdrop" id="ad-modal" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="ad-title">
+    <div class="modal-head"><h2 id="ad-title">激励视频（占位）</h2><button class="icon-btn" id="btn-ad-close" aria-label="关闭">×</button></div>
+    <p id="ad-desc" class="ad-desc"></p>
+    <p class="micro">正式版此处拉起平台激励视频：微信 wx.createRewardedVideoAd / 抖音 tt.createRewardedVideoAd / Web 可接 H5 Games Ads。看完才发奖。</p>
+    <div class="panel-actions">
+      <button id="btn-ad-mock" class="btn primary">模拟看完 · 发奖</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast num" id="toast" role="status" hidden></div>
+
+<script src="shared/core.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
