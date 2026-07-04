@@ -286,9 +286,7 @@
   function offsetLine(now, a, b) {
     var diff = zoneOffsetMinutes(now, b.z) - zoneOffsetMinutes(now, a.z);
     if (diff === 0) return "Same clock, different streets.";
-    var abs = Math.abs(diff);
-    var s = Math.floor(abs / 60) + "h" + (abs % 60 ? " " + (abs % 60) + "m" : "");
-    return b.n + " runs " + s + " " + (diff > 0 ? "ahead" : "behind") + ".";
+    return b.n + " runs " + fmtDur(Math.abs(diff)) + " " + (diff > 0 ? "ahead" : "behind") + ".";
   }
 
   /* ====================================================== expose for tests */
@@ -388,8 +386,13 @@
   function loadMeter(key) {
     var raw = loadJSON(key);
     var m = { v: 1, ms: 0, met: null };
-    if (raw && typeof raw.ms === "number" && isFinite(raw.ms) && raw.ms >= 0) m.ms = raw.ms;
-    if (raw && typeof raw.met === "string" && /^\d{4}-\d{2}-\d{2}$/.test(raw.met) && !isNaN(Date.parse(raw.met))) m.met = raw.met;
+    /* ms is real time this page has watched — it cannot exceed the time the
+     * product has existed. Anything bigger (or negative, or non-numeric) is
+     * corrupt storage and resets to 0 rather than poisoning the keepsake. */
+    var msCap = Date.now() - Date.UTC(2024, 0, 1);
+    if (raw && typeof raw.ms === "number" && isFinite(raw.ms) && raw.ms >= 0 && raw.ms <= msCap) m.ms = raw.ms;
+    var met = raw && raw.met;
+    if (typeof met === "string" && /^\d{4}-\d{2}-\d{2}$/.test(met) && !isNaN(Date.parse(met)) && Date.parse(met) <= Date.now()) m.met = met;
     return m;
   }
 
@@ -717,18 +720,17 @@
       box.innerHTML = '<p class="no-win">Nothing lines up in the next 24 hours. Nudge a sleep or busy block — fifteen minutes is a start.</p>';
       return;
     }
+    /* the hero window leads; the smaller ones follow in day order */
     var main = longestWindow(day);
-    var html = "";
+    var tm = winTimes(main);
+    var html =
+      '<div class="win main"><div class="win-name">“' + esc(windowName(main, S.a.z, S.b.z)) + '”</div>' +
+      '<div class="win-times">' + tm.a + " for you · " + tm.b + " for them · " + fmtDur(main.minutes) + "</div></div>";
     for (var i = 0; i < day.windows.length; i++) {
       var w = day.windows[i];
+      if (w === main) continue;
       var t = winTimes(w);
-      if (w === main) {
-        html +=
-          '<div class="win main"><div class="win-name">“' + esc(windowName(w, S.a.z, S.b.z)) + '”</div>' +
-          '<div class="win-times">' + t.a + " for you · " + t.b + " for them · " + fmtDur(w.minutes) + "</div></div>";
-      } else {
-        html += '<div class="win">' + t.a + " you · " + t.b + " them · " + fmtDur(w.minutes) + "</div>";
-      }
+      html += '<div class="win">' + t.a + " you · " + t.b + " them · " + fmtDur(w.minutes) + "</div>";
     }
     box.innerHTML = html;
   }
@@ -951,16 +953,21 @@
         }
       }
     }
+    /* overlap glow: a translucent wash + hairline, same restraint as the page —
+     * the tracks must stay readable underneath it */
     for (i = 0; i < S.day.windows.length; i++) {
       var win = S.day.windows[i];
       var wx = px(win.i0);
       var ww = px(win.i1 + 1) - wx;
-      ctx.shadowColor = "rgba(255,233,184,0.8)";
-      ctx.shadowBlur = 26;
-      ctx.fillStyle = "rgba(255,236,192,0.92)";
       roundRect(ctx, wx + 1, yA - 7, Math.max(3, ww - 2), yB + hT - yA + 14, 7);
+      ctx.shadowColor = "rgba(255,233,184,0.55)";
+      ctx.shadowBlur = 22;
+      ctx.fillStyle = "rgba(255,236,192,0.26)";
       ctx.fill();
       ctx.shadowBlur = 0;
+      ctx.strokeStyle = COLORS.glow;
+      ctx.lineWidth = 2;
+      ctx.stroke();
     }
     ctx.font = "22px " + SANS;
     ctx.fillStyle = COLORS.dim;
@@ -981,12 +988,17 @@
     ctx.fillStyle = COLORS.ink;
     ctx.fillText(line3, M, 880);
 
+    /* date stamp — a keepsake should know its own day */
+    ctx.font = "24px " + SANS;
+    ctx.fillStyle = COLORS.dim;
+    ctx.fillText(d.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" }), M, 936);
+
     /* odometer */
     var totalH = Math.floor(meterTotalMs() / 3600000);
     if (totalH > 0) {
       ctx.font = "600 34px " + SANS;
       ctx.fillStyle = COLORS.amber;
-      ctx.fillText(totalH.toLocaleString("en-US") + " hours awake together" + (S.meter.met ? " since " + S.meter.met : ""), M, 960);
+      ctx.fillText(totalH.toLocaleString("en-US") + " hours awake together" + (S.meter.met ? " since " + S.meter.met : ""), M, 1010);
     }
 
     /* footer */
