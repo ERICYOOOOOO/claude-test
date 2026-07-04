@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>每日一人 · 用是/否问题猜出今天这位人物</title>
+<meta name="description" content="每天一位名人。你只能问是/否问题：时代、地域、领域、身份、生平，五类线索，看几问能猜出 TA。猜中后有一页人物小传等你。">
+<meta property="og:title" content="每日一人">
+<meta property="og:description" content="每天一位历史人物，只能问是/否问题。今天你几问破解？">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%23b23a2b'/%3E%3Ctext x='16' y='23' font-size='20' text-anchor='middle' fill='%23f5efe3' font-family='serif'%3E人%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="masthead">
+  <div class="wrap masthead-inner">
+    <span class="brand-seal" aria-hidden="true">人</span>
+    <div class="masthead-title">
+      <h1>每日一人</h1>
+      <p class="tagline">只能问是与否，猜出今天这位人物</p>
+    </div>
+    <div class="masthead-meta">
+      <span id="issue-no">第 — 期</span>
+      <time id="date-line"></time>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- 谜题页 -->
+  <section id="view-game" aria-label="今日谜题">
+    <div id="practice-banner" class="practice-banner" hidden></div>
+
+    <div class="status-bar">
+      <span id="q-count" aria-live="polite">已问 0 题</span>
+      <span id="streak-line"></span>
+      <span class="status-actions">
+        <button type="button" class="text-btn" id="btn-help" aria-expanded="false">玩法</button>
+        <button type="button" class="text-btn" id="btn-archive">档案</button>
+      </span>
+    </div>
+
+    <div id="help-panel" class="help-panel" hidden>
+      <p>每天全球同一位人物。点下面的问题，我只回答<strong>是</strong>或<strong>否</strong>；
+      每问一题计一次，随时可以在输入框里猜人名——猜错同样计一次。
+      问得越少，段位越高：五问以内是「神探」。</p>
+    </div>
+
+    <div class="guess-box">
+      <form id="guess-form">
+        <label class="visually-hidden" for="guess-input">猜人名</label>
+        <input id="guess-input" type="text" autocomplete="off" spellcheck="false"
+               placeholder="想到是谁了？输入人名来猜" enterkeyhint="go">
+        <button type="submit" id="btn-guess">猜</button>
+      </form>
+      <ul id="suggestions" class="suggestions" hidden></ul>
+      <p id="guess-feedback" class="guess-feedback" aria-live="polite"></p>
+    </div>
+
+    <nav class="cat-tabs" id="cat-tabs" aria-label="问题分类"></nav>
+    <div id="question-list" class="question-list"></div>
+
+    <div class="asked-log">
+      <h2 class="log-title">问询记录</h2>
+      <p id="trace-line" class="trace-line" aria-hidden="true"></p>
+      <ol id="log" class="log"></ol>
+      <p id="log-empty" class="log-empty">还没有问过问题。从上面的索引里挑一条开始。</p>
+    </div>
+
+    <p class="surrender-row">
+      <button type="button" class="text-btn" id="btn-surrender" hidden>翻到答案页（放弃本期，连胜清零）</button>
+    </p>
+  </section>
+
+  <!-- 辞条页（揭晓） -->
+  <section id="view-reveal" hidden aria-label="人物辞条">
+    <article class="entry">
+      <div class="entry-head">
+        <div class="crest" id="crest" aria-hidden="true"><span id="crest-char"></span></div>
+        <div class="entry-title">
+          <p class="entry-issue" id="entry-issue"></p>
+          <h2 id="entry-name"></h2>
+          <p class="entry-years" id="entry-years"></p>
+          <p class="entry-meta" id="entry-meta"></p>
+        </div>
+      </div>
+      <div class="entry-columns">
+        <p class="entry-bio" id="entry-bio"></p>
+      </div>
+      <p class="entry-epitaph" id="entry-epitaph"></p>
+    </article>
+
+    <div class="result-box">
+      <p class="result-line" id="result-line"></p>
+      <p class="result-trace" id="result-trace"></p>
+      <div class="share-row">
+        <button type="button" id="btn-copy">复制战绩</button>
+        <button type="button" id="btn-png">保存图片</button>
+      </div>
+      <p class="share-feedback" id="share-feedback" aria-live="polite"></p>
+      <p class="stats-line" id="stats-line"></p>
+      <p class="countdown" id="countdown"></p>
+      <p class="reveal-actions">
+        <button type="button" class="text-btn" id="btn-to-archive">翻往期档案，再练一局</button>
+      </p>
+    </div>
+
+    <!-- 广告位：默认自推广。接入 AdSense 时，将本 aside 内容替换为广告代码，
+         保持 .ad-slot 容器样式即可不破坏版面。详见 DEPLOY.md。 -->
+    <aside class="ad-slot" aria-label="推广">
+      <p class="ad-slot-tag">自推广</p>
+      <p>觉得今天这位有意思？把这页发给一个会喜欢 TA 的人。</p>
+    </aside>
+  </section>
+
+  <!-- 档案页 -->
+  <section id="view-archive" hidden aria-label="往期档案">
+    <h2 class="archive-title">往期档案</h2>
+    <p class="archive-note">往期仅作练习，不计连胜，不改纪录。</p>
+    <ol id="archive-list" class="archive-list"></ol>
+    <p class="reveal-actions">
+      <button type="button" class="text-btn" id="btn-back-today">回到今天</button>
+    </p>
+  </section>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <p>每日一人 · 一部每天只翻开一页的人物辞典</p>
+  </div>
+</footer>
+
+<div id="stamp" class="stamp" hidden aria-hidden="true"></div>
+<div id="day-rollover" class="day-rollover" hidden>
+  <p>新的一期已经开始。</p>
+  <button type="button" id="btn-reload">翻开今天这页</button>
+</div>
+<canvas id="share-canvas" width="1080" height="1350" hidden></canvas>
+
+<script src="questions.js"></script>
+<script src="people.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
