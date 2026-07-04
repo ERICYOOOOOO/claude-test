@@ -158,6 +158,31 @@ async function pickCity(page, side, query, expectName) {
   await ctx.close();
 }
 
+/* ============================================ schedule editing end-to-end */
+{
+  console.log("== schedule editing: same city, no sleep, no busy → 24h ==");
+  const ctx = await browser.newContext({ viewport: { width: 1280, height: 800 } });
+  const page = await ctx.newPage();
+  const errors = [];
+  page.on("console", (m) => { if (m.type() === "error") errors.push(m.text()); });
+  page.on("pageerror", (e) => errors.push(String(e)));
+
+  await page.goto(URL + "#tokyo/tokyo");
+  await page.waitForSelector("#result:not([hidden])");
+  for (const side of ["A", "B"]) {
+    await page.click(`.picker:has(#city${side}) .sched summary`);
+    await page.fill(`#sleepStart${side}`, "00:00");
+    await page.fill(`#sleepEnd${side}`, "00:00");
+    await page.selectOption(`#busyDays${side}`, "never");
+  }
+  const v = (await page.textContent("#verdictNum")).trim();
+  check(v === "24h", `same city with empty schedules shows 24h (got “${v}”)`);
+  const same = await page.textContent("#offsetLine");
+  check(/Same clock/.test(same), `offset line acknowledges the same clock (got “${same.trim()}”)`);
+  check(errors.length === 0, "zero console errors while editing schedules" + (errors.length ? " — " + errors.join(" | ") : ""));
+  await ctx.close();
+}
+
 /* ===================================================== reduced motion pass */
 {
   console.log("== prefers-reduced-motion ==");
