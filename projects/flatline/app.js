@@ -53,7 +53,9 @@
   }
   function validResult(r) {
     return !!r && typeof r === 'object' && Number.isInteger(r.day) &&
-      Number.isFinite(r.calm) && typeof r.status === 'string' && Array.isArray(r.scores);
+      Number.isFinite(r.calm) && typeof r.status === 'string' && Array.isArray(r.scores) &&
+      typeof r.date === 'string' &&
+      (r.status !== 'CODEBLUE' || Number.isInteger(r.failBeat)); // 防损坏档案把 undefined 画上分享卡
   }
   function loadStore() {
     const d = defaultStore();
@@ -549,6 +551,7 @@
       locked: false, status: null, failBeat: null,
     };
     el.issueTag.textContent = mode === 'daily' ? '#' + S.game.issue : '练习';
+    el.beatCounter.textContent = '开始监护';
     el.calmVal.textContent = '--';
     ECG.mode = 'run'; ECG.bpm = 62; ECG.tension = 0.12;
     setBpm(62);
@@ -813,6 +816,8 @@
 
   function showResult(res) {
     setScreen('result');
+    el.beatCounter.textContent = '监护结束';   // 顶栏不再停留在"拍 N/14"
+    el.phaseLabel.textContent = 'REPORT';      // 底栏结束游戏中阶段标签
     el.resultHead.textContent = (res.mode === 'practice' ? '练习局' : '#' + res.issue) +
       ' · ' + res.date + ' · 监护结束';
     drawResultCanvas(res);
