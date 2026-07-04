@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>At Your Age — how far behind are you, exactly?</title>
+<meta name="description" content="Enter your birthday. We compute your age to the day, then compare it against people who peaked indecently early — or bloomed indecently late. Roast mode stings. Heal mode forgives.">
+<meta property="og:title" content="At Your Age">
+<meta property="og:description" content="By your exact age, Mozart had been dead for years. Or: Grandma Moses hadn't picked up a brush yet. Pick your poison.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://atyourage.fyi/">
+<meta name="twitter:card" content="summary">
+<link rel="canonical" href="https://atyourage.fyi/">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23ffffff'/%3E%3Crect y='24' width='32' height='8' fill='%23e0332b'/%3E%3Ctext x='16' y='20' font-family='Helvetica,Arial' font-size='17' font-weight='800' fill='%23111111' text-anchor='middle'%3EAY%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-mode="roast">
+
+<header class="mast wrap">
+  <span class="wordmark">AT YOUR AGE<i>.</i></span>
+  <span class="mast-note"><span id="count">—</span> receipts on file</span>
+</header>
+
+<main class="wrap">
+
+  <!-- Screen 1: the gate -->
+  <section id="gate">
+    <h1>How far behind are you, <em>exactly?</em></h1>
+    <p class="gate-sub">Enter your birthday. We compute your age to the day, then
+    hold it against people who peaked indecently early — or bloomed indecently
+    late. One number, two ways to feel about it.</p>
+
+    <form id="birthForm" class="birthform" novalidate autocomplete="off">
+      <div class="fields">
+        <div class="field field--y">
+          <label for="year">Year</label>
+          <input id="year" name="year" inputmode="numeric" maxlength="4" placeholder="1995">
+        </div>
+        <div class="field field--m">
+          <label for="month">Month</label>
+          <input id="month" name="month" inputmode="numeric" maxlength="2" placeholder="06">
+        </div>
+        <div class="field field--d">
+          <label for="day">Day</label>
+          <input id="day" name="day" inputmode="numeric" maxlength="2" placeholder="15">
+        </div>
+        <button id="go" class="btn" type="submit">Run the numbers</button>
+      </div>
+      <p id="err" role="alert" hidden></p>
+    </form>
+
+    <p class="gate-foot">Your date never leaves this page. No account, no cookies, no mercy.</p>
+  </section>
+
+  <!-- Screen 2: the verdict -->
+  <section id="result" hidden>
+    <div class="topline">
+      <button id="flip" class="flip" type="button" aria-pressed="false"
+              aria-label="Mode: roast. Activate to switch to heal mode.">
+        <span class="flip-inner">
+          <span class="flip-face face-roast" aria-hidden="true"><b>ROAST</b><i>flip to heal &#8595;</i></span>
+          <span class="flip-face face-heal" aria-hidden="true"><b>HEAL</b><i>flip to roast &#8593;</i></span>
+        </span>
+      </button>
+      <button id="editBirth" class="ghost" type="button">b. <span id="bLabel"></span> — change</button>
+    </div>
+
+    <div class="agewrap" aria-live="polite">
+      <div id="ageNum" class="huge">—</div>
+      <p id="ageSub" class="agesub"></p>
+    </div>
+
+    <div class="band" id="band"></div>
+
+    <div class="verdict-clip">
+      <p id="verdict" class="verdict" aria-live="polite"></p>
+    </div>
+    <p class="meta"><span id="metaText"></span> <a id="personLink" href="#">full ledger &#8594;</a></p>
+
+    <div class="actions">
+      <button id="another" class="btn" type="button">Another one</button>
+      <button id="copy" class="btn btn--ghost" type="button">Copy text</button>
+      <button id="save" class="btn btn--ghost" type="button">Save card</button>
+    </div>
+
+    <!-- ============================= AD SLOT =============================
+         Default: quiet self-promo. To activate AdSense:
+         1. Get the site approved, then create a display unit.
+         2. Replace the inner <p class="adcopy"> with the AdSense <ins> tag
+            and add the script tag it comes with.
+         3. Keep max-height ~120px so the layout stays intact.
+         See MARKETING.md §AdSense for the full checklist. -->
+    <aside class="adslot" aria-label="advertisement">
+      <p class="kicker">Advertisement</p>
+      <p class="adcopy">This space is deliberately quiet. The calendar makes enough noise.</p>
+    </aside>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    Ages are computed from public birth and event dates; year-precision facts are
+    rounded to whole years. Off by a day? Blame the Gregorian calendar.
+    · <a href="people/index.html">the full ledger</a>
+    · your birthday stays in your browser.
+  </div>
+</footer>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

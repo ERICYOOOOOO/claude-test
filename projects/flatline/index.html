@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Flatline — 每日镇定监护</title>
+<meta name="description" content="每天一局 45 秒的稳住挑战。监护仪逐拍记录你的微反应，最后画成一条心电图：稳的人得一条平线，崩的人得一记猩红尖峰。今天你稳得住吗？">
+<meta name="theme-color" content="#05080a">
+<meta property="og:title" content="Flatline — 每日镇定监护">
+<meta property="og:description" content="45 秒，14 拍。监护仪会把你的手抖画出来。">
+<meta property="og:type" content="website">
+<meta property="og:image" content="og.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%2305080a'/%3E%3Cpath d='M2 18h7l3-9 5 14 3-8 2 3h8' fill='none' stroke='%232fff9e' stroke-width='2.5' stroke-linejoin='round' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="monitor" id="monitor">
+  <header class="bar">
+    <div class="brand">FLATLINE<span class="issue-tag" id="issueTag"></span></div>
+    <div class="bar-mid" id="beatCounter" aria-live="polite"></div>
+    <button class="icon-btn" id="muteBtn" type="button" aria-label="声音开关" aria-pressed="true">SND</button>
+  </header>
+
+  <div class="ecg-wrap" aria-hidden="true">
+    <canvas id="ecg"></canvas>
+    <div class="vitals">
+      <span class="vital"><b id="bpmVal">62</b><i>BPM</i></span>
+      <span class="vital"><b id="spo2Val">98</b><i>SpO₂</i></span>
+      <span class="vital"><b id="calmVal">--</b><i>CALM</i></span>
+    </div>
+  </div>
+
+  <main id="stage" role="button" tabindex="0" aria-label="判定区：空格键或点击任意处输入">
+
+    <section id="scrStart" class="screen">
+      <p class="mono-dim" id="startDate"></p>
+      <h1 class="start-title">今日监护 <span id="startIssue"></span></h1>
+      <p class="streak-line" id="streakLine" hidden></p>
+      <div id="startFresh">
+        <p class="press-hint blink-slow">按下任意处 开始</p>
+      </div>
+      <div id="startDone" hidden>
+        <canvas id="miniWave" class="mini-wave" width="320" height="72"></canvas>
+        <p class="done-stamp" id="doneStamp"></p>
+        <p class="mono-dim" id="doneCalm"></p>
+        <div class="btn-row">
+          <button type="button" class="btn" id="copyBtn2">复制战报</button>
+          <button type="button" class="btn" id="pngBtn2">存图</button>
+          <button type="button" class="btn ghost" id="practiceBtn2">练习模式</button>
+        </div>
+        <p class="mono-dim countdown">下一期 <span id="countdown2">--:--:--</span></p>
+      </div>
+      <p class="foot-note">本机不联网 · 记录只存在这台监护仪里</p>
+    </section>
+
+    <section id="scrGame" class="screen" hidden>
+      <div class="cue-area">
+        <div id="cueTap" class="cue" hidden>
+          <div class="tap-strip">
+            <div class="tap-zone" id="tapZone"></div>
+            <div class="tap-target" id="tapTarget"></div>
+            <div class="tap-cursor" id="tapCursor"></div>
+          </div>
+        </div>
+        <div id="cueHold" class="cue" hidden>
+          <p class="hold-label" id="holdLabel">·</p>
+          <div class="hold-bar"><div class="hold-fill" id="holdFill"></div></div>
+        </div>
+        <div id="cueWait" class="cue" hidden>
+          <p class="wait-fake" id="waitFake">!!</p>
+        </div>
+      </div>
+      <p id="verdict" class="verdict" aria-live="polite"></p>
+      <p id="hint" class="hint" hidden>光标过线的瞬间 · 点</p>
+      <div id="distractLayer" aria-hidden="true"></div>
+    </section>
+
+    <section id="scrResult" class="screen" hidden>
+      <p class="mono-dim" id="resultHead"></p>
+      <div class="wave-box"><canvas id="resultWave"></canvas><div class="stamp" id="stamp"></div></div>
+      <p class="calm-row">镇定指数 <b id="calmIndex">--</b><span class="mono-dim">/100</span></p>
+      <p class="mono-dim" id="resultSub"></p>
+      <div class="btn-row">
+        <button type="button" class="btn" id="copyBtn">复制战报</button>
+        <button type="button" class="btn" id="pngBtn">存图</button>
+        <button type="button" class="btn ghost" id="practiceBtn">练习模式</button>
+      </div>
+      <p class="mono-dim countdown" id="countdownRow">下一期 <span id="countdown">--:--:--</span></p>
+      <!--
+        广告位（默认渲染为极简自推广，不破坏监护仪外观）
+        AdSense 激活步骤：
+        1. AdSense 后台添加站点并通过审核；
+        2. 用官方 <ins class="adsbygoogle"> 代码替换下方 .promo 内部（保留容器与配色，宽度自适应）；
+        3. 在 </body> 前加入 adsbygoogle.js 脚本（这是全站唯一允许的外部脚本）；
+        4. 位置只允许在此（结算屏底部），游戏中永不出广告。
+      -->
+      <aside class="promo" id="adSlot"><p>做这台监护仪的人还在做别的怪东西 → <span class="domain">flatline.day</span></p></aside>
+    </section>
+
+  </main>
+
+  <footer class="bar bottom"><span id="phaseLabel">IDLE</span><span class="domain">flatline.day</span></footer>
+  <div class="flash" id="flash" aria-hidden="true"></div>
+  <div class="scanlines" aria-hidden="true"></div>
+</div>
+<script src="app.js"></script>
+</body>
+</html>
