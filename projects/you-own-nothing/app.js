@@ -835,8 +835,20 @@
     ctx.fillStyle = '#241c15';
     ctx.fillRect(0, 0, W, H);
 
+    var subs = topAbsurd(5);
+    var allSubCount = OBJECTS.filter(function (o) {
+      var d = state.decisions[o.id];
+      return d && d.status === 'subscribed';
+    }).length;
+    var moreCount = allSubCount - subs.length;
+
+    // paper hugs its content and sits centered — no dead thermal paper
+    var itemsH = subs.length ? subs.length * 34 + (moreCount > 0 ? 30 : 0) + 6 : 70;
+    var paperH = 176 + itemsH + 282 + 36;
+
     // receipt paper with torn edges
-    var px = 90, pw = 540, pt = 78, pb = 922, tooth = 18, toothH = 11;
+    var px = 90, pw = 540, tooth = 18, toothH = 11;
+    var pt = Math.round((H - paperH) / 2), pb = pt + paperH;
     ctx.save();
     ctx.shadowColor = 'rgba(0,0,0,0.5)';
     ctx.shadowBlur = 30;
@@ -889,7 +901,6 @@
     dashed(y);
     y += 40;
 
-    var subs = topAbsurd(5);
     var left = px + 38, right = px + pw - 38;
     ctx.font = '17px ' + mono;
     if (subs.length === 0) {
@@ -910,6 +921,15 @@
         ctx.fillText(money(objectMonthly(o.id)), right, y);
         y += 34;
       });
+      if (moreCount > 0) {
+        // the five most absurd made the card; the rest still bill
+        ctx.fillStyle = faint;
+        ctx.font = '15px ' + mono;
+        ctx.textAlign = 'left';
+        ctx.fillText('+ ' + moreCount + ' more subscription' + (moreCount === 1 ? '' : 's'), left, y);
+        ctx.font = '17px ' + mono;
+        y += 30;
+      }
       y += 6;
     }
 

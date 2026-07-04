@@ -39,6 +39,16 @@ body {
 .preload * { transition: none !important; animation-duration: 0.01ms !important; }
 .hidden { display: none !important; }
 
+/* body is the flex column, but #app is its only child — pass the column
+   through so #scene-wrap's flex:1 actually centers the scene and the
+   disclaimer sits at the bottom of the viewport */
+#app {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
 /* ============ HUD (warm language) ============ */
 
 .hud {

@@ -41,7 +41,13 @@ function clockScript(localIso) {
   })();`;
 }
 function seedScript(storeObj) {
-  return `try { localStorage.setItem('flatline.v1', ${JSON.stringify(JSON.stringify(storeObj))}); } catch (e) {}`;
+  // 只在首次加载注入（reload 后 addInitScript 会重跑，不能把游戏写入的档案又盖回去）
+  return `try {
+    if (!localStorage.getItem('__qaSeeded')) {
+      localStorage.setItem('__qaSeeded', '1');
+      localStorage.setItem('flatline.v1', ${JSON.stringify(JSON.stringify(storeObj))});
+    }
+  } catch (e) {}`;
 }
 const DAY_0701 = 20635; // 2026-07-01 = #1
 const goodResult = (day, issue) => ({
@@ -335,12 +341,14 @@ console.log('\n[F] 触屏 tap 单计一次 / 键盘按住时触屏不双计');
   const acted = [];
   const { s: res, waitSeen } = await driveGood(page, {
     onWait: async (nth, beat) => {
+      // 注意：必须用 touchscreen.tap（原始触屏输入）。page.tap 会等元素"稳定"，
+      // 而 P2/P3 屏幕摇晃是玩法本体，元素永不稳定 → page.tap 挂起数秒拖死驱动循环。
       if (nth === 1) {           // 真实触屏 tap 一次 → WAIT 应恰好计 1 次（得 8 分）
-        await page.tap('#stage');
+        await page.touchscreen.tap(187, 400);
         acted.push(beat);
       } else if (nth === 2) {    // 键盘按住期间触屏点一下 → 仍只算 1 次输入
         await page.keyboard.down('Space');
-        await page.tap('#stage');
+        await page.touchscreen.tap(187, 400);
         await page.keyboard.up('Space');
         acted.push(beat);
       }                          // 其余 WAIT 忍住 → 100
