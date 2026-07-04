@@ -457,10 +457,10 @@ body {
   box-shadow: 0 0 0 1px var(--saas-blue);
 }
 
-.tier .t-name { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--saas-gray); }
-.tier .t-price { font-size: 17.5px; font-weight: 700; margin: 4px 0 2px; }
+.tier .t-name { display: block; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--saas-gray); }
+.tier .t-price { display: block; font-size: 17.5px; font-weight: 700; margin: 4px 0 2px; }
 .tier .t-per { font-size: 10px; color: var(--saas-faint); font-weight: 400; }
-.tier .t-blurb { font-size: 11px; color: var(--saas-gray); margin-top: 6px; line-height: 1.45; }
+.tier .t-blurb { display: block; font-size: 11px; color: var(--saas-gray); margin-top: 6px; line-height: 1.45; }
 
 .t-badge {
   position: absolute;
