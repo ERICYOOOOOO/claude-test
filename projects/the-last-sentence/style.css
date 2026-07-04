@@ -1,0 +1,347 @@
+/* ---------------------------------------------------------------------------
+   The Last Sentence — minimal literary / monument.
+   One theme: near-black. Two voices: serif (the living sentence) and
+   monospace (the machinery: timers, graves, controls).
+   The only emphasis colour is the survival duration (candle amber).
+   Type scale 1.25 · spacing on a 4/8px grid.
+--------------------------------------------------------------------------- */
+
+:root {
+  --bg: #111110;
+  --ink: #e8e6e1;        /* bone white */
+  --dim: #8a867e;
+  --faint: #56534d;
+  --line: #29271f;
+  --accent: #d8a03d;     /* candle amber — survival time only */
+  --danger: #c96f5a;
+  --serif: Georgia, 'Iowan Old Style', 'Times New Roman', serif;
+  --mono: ui-monospace, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-fall: cubic-bezier(0.55, 0, 0.85, 0.4);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { background: var(--bg); }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 14px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px;
+  clip: rect(0 0 0 0); overflow: hidden; white-space: nowrap;
+}
+
+:focus-visible { outline: 1px solid var(--ink); outline-offset: 3px; }
+
+::selection { background: var(--accent); color: var(--bg); }
+
+/* --- demo banner ---------------------------------------------------------- */
+.demo-banner {
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--line);
+  color: var(--dim);
+  font-size: 12px;
+  text-align: center;
+  letter-spacing: 0.02em;
+}
+
+/* --- top bar ---------------------------------------------------------------- */
+.top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 16px 20px;
+  max-width: 960px;
+  margin: 0 auto;
+  width: 100%;
+}
+.wordmark {
+  font-size: 12px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+.conn { display: inline-flex; align-items: center; gap: 8px; font-size: 11px; color: var(--faint); }
+.dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--faint);
+  transition: background 240ms var(--ease-out);
+}
+.dot.live { background: var(--accent); }
+.dot.lost { background: var(--danger); }
+
+/* --- the stage --------------------------------------------------------------- */
+.stage {
+  min-height: calc(100svh - 56px);
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px 20px 48px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 40px;
+}
+
+.stage-note {
+  font-size: 12px;
+  color: var(--faint);
+  text-align: center;
+  letter-spacing: 0.04em;
+}
+
+.alive { text-align: center; }
+
+.sentence-box { position: relative; min-height: 2.6em; }
+
+.sentence {
+  font-family: var(--serif);
+  font-size: clamp(28px, 5vw, 58px);
+  line-height: 1.28;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+  overflow-wrap: break-word;
+  transition: opacity 180ms var(--ease-out);
+}
+.sentence.long { font-size: clamp(21px, 3.4vw, 40px); }
+
+/* typewriter block caret, blinking like a heartbeat */
+.sentence::after {
+  content: '';
+  display: inline-block;
+  width: 0.5em; height: 1em;
+  margin-left: 0.12em;
+  vertical-align: -0.12em;
+  background: var(--faint);
+  animation: blink 1.1s steps(1) infinite;
+}
+.sentence.typing::after { animation: none; background: var(--dim); }
+@keyframes blink { 0%, 55% { opacity: 1; } 56%, 100% { opacity: 0; } }
+
+/* the old sentence, falling into the graveyard */
+.sentence.dying {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  animation: fall 400ms var(--ease-fall) forwards;
+}
+.sentence.dying::after { display: none; }
+@keyframes fall {
+  0%   { transform: translateY(0);    opacity: 1; }
+  100% { transform: translateY(42vh); opacity: 0; }
+}
+
+.lifeline {
+  margin-top: 24px;
+  font-size: clamp(15px, 2.2vw, 19px);
+  color: var(--dim);
+}
+.lifeline .seq { color: var(--ink); }
+.lifeline .sep { color: var(--faint); padding: 0 4px; }
+.timer {
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum';
+}
+
+.meta { margin-top: 8px; font-size: 12px; color: var(--faint); }
+
+/* --- the form ----------------------------------------------------------------- */
+.say { max-width: 560px; width: 100%; margin: 0 auto; }
+
+#input {
+  width: 100%;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--faint);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 19px;
+  padding: 8px 2px;
+  border-radius: 0;
+  transition: border-color 180ms var(--ease-out);
+}
+#input::placeholder { color: var(--faint); font-style: italic; }
+#input:focus { outline: none; border-bottom-color: var(--ink); }
+#input.reject { animation: shake 240ms var(--ease-out); border-bottom-color: var(--danger); }
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
+}
+
+.say-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+}
+.chars { font-size: 12px; color: var(--faint); font-variant-numeric: tabular-nums; }
+.chars.low { color: var(--danger); }
+
+#submit {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--dim);
+  padding: 12px 24px;
+  min-height: 44px;
+  cursor: pointer;
+  transition: border-color 160ms var(--ease-out), color 160ms var(--ease-out), background 160ms var(--ease-out);
+  font-variant-numeric: tabular-nums;
+}
+#submit:hover:not(:disabled) { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+#submit:active:not(:disabled) { transform: translateY(1px); }
+#submit:disabled { color: var(--faint); border-color: var(--line); cursor: default; }
+
+.feedback { margin-top: 8px; min-height: 1.6em; font-size: 12px; color: var(--dim); }
+.feedback.err { color: var(--danger); }
+
+/* --- your epitaph ---------------------------------------------------------------- */
+.mine {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 16px;
+  border: 1px solid var(--line);
+  text-align: center;
+}
+.mine p { font-size: 12px; color: var(--dim); }
+.mine p b { color: var(--accent); font-weight: normal; font-variant-numeric: tabular-nums; }
+
+.ghost-btn {
+  margin-top: 8px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  background: transparent;
+  color: var(--dim);
+  border: 0;
+  border-bottom: 1px solid var(--faint);
+  padding: 6px 2px;
+  min-height: 32px;
+  cursor: pointer;
+  transition: color 160ms var(--ease-out);
+}
+.ghost-btn:hover { color: var(--ink); }
+
+.down-hint {
+  text-align: center;
+  font-size: 11px;
+  color: var(--faint);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+/* --- the graveyard ------------------------------------------------------------------ */
+.graveyard {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 64px 20px 40px;
+  border-top: 1px solid var(--line);
+}
+
+.gy-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 32px;
+}
+.gy-head h2 {
+  font-size: 12px;
+  font-weight: normal;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+.gy-count { font-size: 12px; color: var(--faint); font-variant-numeric: tabular-nums; }
+
+.graves { list-style: none; }
+
+.grave {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--line);
+}
+.grave.fresh { animation: settle 320ms var(--ease-out); }
+@keyframes settle {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.g-row {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  font-size: 11px;
+  color: var(--faint);
+  font-variant-numeric: tabular-nums;
+}
+.g-life { color: var(--accent); }
+.g-copy {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: transparent;
+  border: 0;
+  color: var(--faint);
+  padding: 8px;
+  margin-right: -8px;
+  min-height: 32px;
+  cursor: pointer;
+  transition: color 160ms var(--ease-out);
+}
+.g-copy:hover { color: var(--ink); }
+
+.g-text {
+  margin-top: 4px;
+  font-family: var(--serif);
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--dim);
+  overflow-wrap: break-word;
+}
+.grave.mine-grave .g-text { color: var(--ink); }
+
+.gy-more { padding: 24px 0; font-size: 11px; color: var(--faint); text-align: center; }
+.gy-sentinel { height: 1px; }
+
+/* --- ad slot & footer --------------------------------------------------------------- */
+.ad-slot {
+  margin-top: 48px;
+  padding: 20px;
+  border: 1px dashed var(--line);
+  text-align: center;
+}
+.ad-slot p { font-size: 11px; color: var(--faint); font-style: italic; font-family: var(--serif); }
+
+.foot { padding: 40px 0 8px; text-align: center; }
+.foot p { font-size: 11px; color: var(--faint); }
+
+/* --- desktop ---------------------------------------------------------------------- */
+@media (min-width: 720px) {
+  body { font-size: 15px; }
+  .stage { gap: 48px; }
+  .sentence { font-size: clamp(40px, 5vw, 64px); }
+  .sentence.long { font-size: clamp(28px, 3.4vw, 44px); }
+}
+
+/* --- reduced motion ------------------------------------------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+  .sentence::after { animation: none; }
+  .sentence.dying { animation: none; opacity: 0; }
+  .grave.fresh { animation: none; }
+  #input.reject { animation: none; }
+  * { transition-duration: 0.01ms !important; }
+}

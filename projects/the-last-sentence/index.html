@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Last Sentence</title>
+  <meta name="description" content="The whole world shares one sentence. Write yours and it replaces whatever was there. The dead ones rest below, each tombstone marked with how long it survived.">
+  <meta property="og:title" content="The Last Sentence">
+  <meta property="og:description" content="Right now, exactly one sentence is alive. Overwrite it.">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%23111110'/%3E%3Crect x='4' y='3' width='3' height='10' fill='%23d8a03d'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div id="demo-banner" class="demo-banner" hidden>
+    offline demo — nothing you write here leaves this page. the real one is a single shared sentence.
+  </div>
+
+  <header class="top">
+    <span class="wordmark">the last sentence</span>
+    <span class="conn"><span id="conn-dot" class="dot"></span><span id="conn-label">connecting</span></span>
+  </header>
+
+  <main class="stage">
+    <p class="stage-note">the whole world shares this sentence. yours will replace it.</p>
+
+    <section class="alive" aria-label="the sentence currently alive">
+      <div id="sentence-box" class="sentence-box">
+        <p id="sentence" class="sentence" aria-live="polite"></p>
+      </div>
+      <p class="lifeline">
+        <span id="seq" class="seq">#—</span>
+        <span class="sep">·</span>
+        alive for <span id="timer" class="timer">0.000s</span>
+      </p>
+      <p class="meta"><span id="dead-count">—</span> sentences died before this one</p>
+    </section>
+
+    <form id="say-form" class="say" autocomplete="off">
+      <label class="visually-hidden" for="input">Write the next sentence</label>
+      <input id="input" name="text" type="text" maxlength="120" spellcheck="false"
+             placeholder="write the one that replaces it" aria-describedby="feedback">
+      <div class="say-row">
+        <span id="chars" class="chars">120</span>
+        <button id="submit" type="submit">overwrite</button>
+      </div>
+      <p id="feedback" class="feedback" role="status" aria-live="polite"></p>
+    </form>
+
+    <div id="mine" class="mine" hidden>
+      <p id="mine-text"></p>
+      <button id="mine-copy" type="button" class="ghost-btn">copy epitaph</button>
+    </div>
+
+    <p class="down-hint" aria-hidden="true">▾ the graveyard</p>
+  </main>
+
+  <section class="graveyard" aria-label="graveyard of overwritten sentences">
+    <header class="gy-head">
+      <h2>graveyard</h2>
+      <p id="gy-count" class="gy-count">—</p>
+    </header>
+    <ol id="graves" class="graves" reversed></ol>
+    <p id="gy-more" class="gy-more" hidden>older sentences are dust. only the last 500 are kept.</p>
+    <div id="gy-sentinel" class="gy-sentinel" aria-hidden="true"></div>
+
+    <!-- Ad slot. Default: quiet self-promotion. To activate AdSense: replace the
+         inner text with your <ins class="adsbygoogle"> unit + loader script, and
+         extend the server's Content-Security-Policy in server.mjs accordingly. -->
+    <aside class="ad-slot">
+      <p>this page holds one sentence at a time. everything else is a grave.</p>
+    </aside>
+
+    <footer class="foot">
+      <p>the last sentence — an experiment in being overwritten.</p>
+    </footer>
+  </section>
+
+  <script src="app.js"></script>
+</body>
+</html>
