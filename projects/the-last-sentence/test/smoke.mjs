@@ -170,7 +170,7 @@ try {
   // A 自己的句子(#2)已死 → 死亡横幅 + "my sentence survived" 文案
   check('A 显示自己句子的死亡横幅', await pageA.isVisible('#mine'));
   const mineTxt = await pageA.textContent('#mine-text');
-  check('死亡横幅含毫秒存活时长', /survived/.test('survived') && DUR_RE.test(mineTxt), mineTxt);
+  check('死亡横幅含毫秒存活时长', /survived/.test(mineTxt) && DUR_RE.test(mineTxt), mineTxt);
   await pageA.click('#mine-copy');
   const myCopy = await pageA.evaluate(() => window.__lastCopy);
   check('my sentence 分享文案', /^my sentence survived .* as #2 on the last sentence — http/.test(myCopy || ''), myCopy);

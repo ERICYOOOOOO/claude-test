@@ -329,6 +329,12 @@ body {
 .foot { padding: 40px 0 8px; text-align: center; }
 .foot p { font-size: 11px; color: var(--faint); }
 
+/* --- touch: every tap target ≥ 44px without changing the visual rhythm ------------- */
+@media (pointer: coarse) {
+  .g-copy { min-height: 44px; padding: 14px 8px; margin-top: -14px; margin-bottom: -10px; }
+  .ghost-btn { min-height: 44px; padding: 12px 8px; }
+}
+
 /* --- desktop ---------------------------------------------------------------------- */
 @media (min-width: 720px) {
   body { font-size: 15px; }

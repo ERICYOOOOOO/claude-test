@@ -43,9 +43,17 @@ const censor = (t) => t.replace(BAD_RE, '▓▓');
 const ESC = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
 const escapeHtml = (t) => t.replace(/[&<>"']/g, (c) => ESC[c]);
 
-// Strip control/zero-width characters, collapse whitespace to single spaces.
+// Strip control, zero-width and bidi-control characters (C0/C1, soft hyphen,
+// ALM, Mongolian VS, ZWSP..RLM, line/para separators, LRE..RLO overrides,
+// word joiner + invisible operators + bidi isolates, BOM, interlinear
+// annotations), then collapse whitespace to single spaces.
 const sanitize = (t) =>
-  t.replace(/[\u0000-\u001f\u007f\u200b-\u200f\u2028\u2029\ufeff]/g, ' ').replace(/\s+/g, ' ').trim();
+  t.replace(/[\u0000-\u001f\u007f-\u009f\u00ad\u061c\u180e\u200b-\u200f\u2028\u2029\u202a-\u202e\u2060-\u206f\ufeff\ufff9-\ufffb]/g, ' ')
+    .replace(/\s+/g, ' ').trim();
+
+// Variation selectors and tag characters are kept (emoji sequences need them),
+// but a sentence made of nothing else renders as pure emptiness — reject it.
+const INVISIBLE_ONLY = /^[\s\ufe00-\ufe0f\u{e0000}-\u{e007f}\u{e0100}-\u{e01ef}]+$/u;
 
 // --- state ------------------------------------------------------------------
 let current = null; // { text (escaped), seq, bornAt }
@@ -128,19 +136,27 @@ function sendJson(res, status, obj, extra = {}) {
 
 // --- request handling ----------------------------------------------------------
 function handleSay(req, res) {
-  let body = '', over = false;
+  // Collect raw buffers and decode once at the end: decoding per-chunk would
+  // mangle a multi-byte UTF-8 character split across TCP packets, and the
+  // body cap must count bytes, not UTF-16 units.
+  const chunks = [];
+  let size = 0, over = false;
   req.on('data', (chunk) => {
-    body += chunk;
-    if (body.length > MAX_BODY && !over) { over = true; sendJson(res, 413, { error: 'too_large' }); req.destroy(); }
+    size += chunk.length;
+    if (size > MAX_BODY) {
+      if (!over) { over = true; sendJson(res, 413, { error: 'too_large' }); req.destroy(); }
+      return;
+    }
+    chunks.push(chunk);
   });
   req.on('end', () => {
     if (over) return;
     let text;
-    try { text = JSON.parse(body).text; } catch { return sendJson(res, 400, { error: 'bad_request' }); }
+    try { text = JSON.parse(Buffer.concat(chunks).toString('utf8')).text; } catch { return sendJson(res, 400, { error: 'bad_request' }); }
     if (typeof text !== 'string') return sendJson(res, 400, { error: 'bad_request' });
 
     text = sanitize(text);
-    if (text.length === 0) return sendJson(res, 400, { error: 'empty' });
+    if (text.length === 0 || INVISIBLE_ONLY.test(text)) return sendJson(res, 400, { error: 'empty' });
     if ([...text].length > MAX_CHARS) return sendJson(res, 400, { error: 'too_long', max: MAX_CHARS });
 
     const ip = clientIp(req);
@@ -182,6 +198,7 @@ function handleEvents(req, res) {
   sseSend(res, 'state', { current, total, graves, now: Date.now() });
   clients.add(res);
   req.on('close', () => clients.delete(res));
+  res.on('error', () => clients.delete(res)); // aborted mid-broadcast: drop, don't throw
 }
 
 function handleStatic(req, res, route) {

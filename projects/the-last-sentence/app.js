@@ -15,7 +15,7 @@
     form: $('say-form'), input: $('input'), chars: $('chars'),
     submit: $('submit'), feedback: $('feedback'),
     mine: $('mine'), mineText: $('mine-text'), mineCopy: $('mine-copy'),
-    graves: $('graves'), gyCount: $('gy-count'), gyMore: $('gy-more'),
+    graves: $('graves'), gyCount: $('gy-count'), gyMore: $('gy-more'), gyEmpty: $('gy-empty'),
     sentinel: $('gy-sentinel'), connDot: $('conn-dot'), connLabel: $('conn-label'),
     demoBanner: $('demo-banner'),
   };
@@ -166,6 +166,7 @@
     ui.graves.textContent = '';
     renderedCount = 0;
     renderMoreGraves();
+    ui.gyEmpty.hidden = graves.length > 0;
   }
 
   new IntersectionObserver((entries) => {
@@ -196,6 +197,7 @@
     const li = graveLi(d.grave);
     li.classList.add('fresh');
     ui.graves.prepend(li);
+    ui.gyEmpty.hidden = true;
     renderedCount += 1;
     renderCounts();
     setSentence(current.text, true);
@@ -362,7 +364,7 @@
 
   // --- demo mode (file:// or static-only hosting) ------------------------------------------------------------
   // A local, self-contained imitation: 12 preset graves, local overwrites only.
-  const DEMO_BAD = /\b(?:fuck|shit|cunt|bitch|asshole|dick|cock|pussy|nigger|nigga|faggot|fag|retard|whore|slut)(?:s|es|ed|er|ers|ing)?\b/gi;
+  const DEMO_BAD = /\b(?:fuck|shit|cunt|bitch|asshole|dick|cock|pussy|nigger|nigga|faggot|fag|retard|whore|slut|kike|spic|chink|tranny)(?:s|es|ed|er|ers|ing)?\b/gi;
   function enterDemo() {
     demo = true;
     ui.demoBanner.hidden = false;

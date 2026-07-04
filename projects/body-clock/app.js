@@ -37,6 +37,7 @@
   var holdT0 = 0;
   var holdSource = null;         // 'pointer' | 'key'
   var holdPointerId = null;
+  var holdTimeout = null;        // 超时保险丝（core.MAX_HOLD_MS）
   var lastResult = null;         // 最近一次 reveal 的 judge 结果
   var adSlot = null;             // 当前激励视频占位槽
   var distortionTimer = null;
@@ -272,6 +273,11 @@
     ensureAudio();
     holdSource = source;
     holdT0 = performance.now();
+    // 超时保险丝：目标最长 12s，按住超过 60s 只可能是挂机/指针卡死，主动作废
+    if (holdTimeout) clearTimeout(holdTimeout);
+    holdTimeout = setTimeout(function () {
+      cancelHold('按了 60 秒 · 这次不算');
+    }, core.MAX_HOLD_MS + 500);
     setPhase('holding');
     setNeedle(0); // 按住时秒针隐藏（CSS opacity），归零待回摆
     vibrate(15);
@@ -283,6 +289,7 @@
   function cancelHold(msg) {
     if (phase !== 'holding') return;
     stopDistortion();
+    if (holdTimeout) { clearTimeout(holdTimeout); holdTimeout = null; }
     holdPointerId = null; holdSource = null;
     setPhase('idle');
     renderHint();
@@ -293,6 +300,7 @@
     if (phase !== 'holding') return;
     var heldMs = performance.now() - holdT0;
     stopDistortion();
+    if (holdTimeout) { clearTimeout(holdTimeout); holdTimeout = null; }
     holdPointerId = null; holdSource = null;
     vibrate(30);
     blip(1300, 26, 0.04);
@@ -300,6 +308,12 @@
       setPhase('idle');
       renderHint();
       toast('太短了 · 不计入');
+      return;
+    }
+    if (heldMs > core.MAX_HOLD_MS) {
+      setPhase('idle');
+      renderHint();
+      toast('按了 60 秒 · 这次不算');
       return;
     }
     resolveAttempt(heldMs);
@@ -354,6 +368,7 @@
 
     renderAttempts();
     renderHeader();
+    renderHint(); // 表盘下提示与剩余次数同步（否则揭晓后仍显示旧文案）
     // 重启入场动画（表针回摆式）
     el.resultPanel.classList.remove('reveal');
     void el.resultPanel.offsetWidth;
@@ -384,6 +399,7 @@
     el.btnAdRetry.hidden = (rec.extra || 0) >= 1;
     el.btnAdDistortion.hidden = state.settings.distortionUnlocked === true;
 
+    renderHint(); // 已锁定态下提示词同步为「今日三次已用完」
     setPhase('summary');
     startCountdown();
     scrollIntoViewSoft(el.summaryPanel);
@@ -593,7 +609,7 @@
   function checkDay() {
     var nd = core.localDayIndex(nowMs());
     if (nd === dayIndex) return;
-    cancelHold();
+    cancelHold('跨零点了 · 这次不算'); // 非按住态下 cancelHold 是空操作，无副作用
     dayIndex = nd;
     state = core.normalizeState(state, dayIndex); // 顺手剪掉过期记录
     saveState();

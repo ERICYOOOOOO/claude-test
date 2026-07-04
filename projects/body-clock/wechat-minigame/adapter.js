@@ -21,18 +21,21 @@ module.exports = {
 
   /* ---------- 画布与系统信息 ---------- */
   createCanvas: function () {
-    // 微信/抖音小游戏首个 createCanvas 返回上屏画布
-    return api.createCanvas();
+    // 微信/抖音小游戏首个 createCanvas 返回上屏画布。
+    // 降级：非小游戏环境（误在 Node/浏览器加载）时快速失败并给出可读原因，
+    // 避免后续在 null 画布上静默报错。
+    if (api && api.createCanvas) return api.createCanvas();
+    throw new Error('body-clock: 请在微信/抖音小游戏环境运行（未检测到 wx/tt）');
   },
   getSystemInfo: function () {
     try { return api.getSystemInfoSync(); }
     catch (e) { return { windowWidth: 375, windowHeight: 667, pixelRatio: 2 }; }
   },
 
-  /* ---------- 触摸 ---------- */
-  onTouchStart: function (fn) { api.onTouchStart(fn); },
-  onTouchEnd: function (fn) { api.onTouchEnd(fn); },
-  onTouchCancel: function (fn) { api.onTouchCancel(fn); },
+  /* ---------- 触摸（无 api 时降级为空操作，便于骨架静态加载） ---------- */
+  onTouchStart: function (fn) { if (api && api.onTouchStart) api.onTouchStart(fn); },
+  onTouchEnd: function (fn) { if (api && api.onTouchEnd) api.onTouchEnd(fn); },
+  onTouchCancel: function (fn) { if (api && api.onTouchCancel) api.onTouchCancel(fn); },
 
   /* ---------- 震动（按下/松开的轻触反馈） ----------
    * 微信: wx.vibrateShort({ type: 'light' | 'medium' | 'heavy' })

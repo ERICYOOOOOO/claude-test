@@ -93,6 +93,7 @@ adapter.onTouchEnd(function () {
   var heldMs = Date.now() - holdT0;
   adapter.vibrateLight();
   if (heldMs < core.MIN_HOLD_MS) { phase = 'idle'; return; } // 误触不消耗机会
+  if (heldMs > core.MAX_HOLD_MS) { phase = 'idle'; return; } // 超时（挂机/切后台卡触摸）作废不消耗
   var res = core.judge(targetMs(), heldMs);
   var rec = todayRec();
   rec.attempts.push({ heldMs: heldMs, errMs: res.errMs, signedMs: res.signedMs, star: distortionOn() });
@@ -275,6 +276,8 @@ function button(label, y) {
 
 /* ---------------- 帧循环（秒针弹簧回摆） ---------------- */
 function tick() {
+  // 超时保险丝：切后台丢 touchend 等场景下，按住超过 MAX_HOLD_MS 自动作废
+  if (phase === 'holding' && Date.now() - holdT0 > core.MAX_HOLD_MS) phase = 'idle';
   // 简易弹簧：让秒针带一点过冲地摆到误差角，与 H5 的 CSS spring 手感一致
   var k = 0.12, damp = 0.82;
   needleVel = (needleVel + (needleTarget - needleDeg) * k) * damp;

@@ -46,6 +46,17 @@
       if (pool[i].dateOverride === info.mmdd) return pool[i];
     }
     var idx = ((info.seed + trackSalt(trackId)) % pool.length + pool.length) % pool.length;
+    /* 相邻两天不重复（覆盖日两侧，单步前后看，确定性不变）：
+       1) 明天是本轨覆盖日且覆盖条恰为今天的轮转位 → 顺延一位（idx+1）；
+       2) 昨天是本轨覆盖日且覆盖条恰为今天的轮转位 → 改用昨天被跳过的那条（idx-1）。 */
+    if (pool.length > 1) {
+      var t = new Date(info.date.getFullYear(), info.date.getMonth(), info.date.getDate() + 1);
+      var tmmdd = two(t.getMonth() + 1) + '-' + two(t.getDate());
+      var y = new Date(info.date.getFullYear(), info.date.getMonth(), info.date.getDate() - 1);
+      var ymmdd = two(y.getMonth() + 1) + '-' + two(y.getDate());
+      if (pool[idx].dateOverride === tmmdd) idx = (idx + 1) % pool.length;
+      else if (pool[idx].dateOverride === ymmdd) idx = (idx - 1 + pool.length) % pool.length;
+    }
     return pool[idx];
   }
   function entryKey(e) { return e.track + '|' + e.source; }

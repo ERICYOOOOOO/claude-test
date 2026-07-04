@@ -165,7 +165,8 @@
    * days 只保留最近 400 天，防止 localStorage 无限膨胀。
    */
   var DAILY_ATTEMPTS = 3;
-  var MIN_HOLD_MS = 200; // 短于此视为误触，不消耗机会
+  var MIN_HOLD_MS = 200;   // 短于此视为误触，不消耗机会
+  var MAX_HOLD_MS = 60000; // 超时保护：目标最长 12s，按住超过 60s 视为挂机/卡指针，作废不消耗
 
   function defaultState() {
     return {
@@ -244,6 +245,7 @@
     STREAK_KEEP_MS: STREAK_KEEP_MS,
     DAILY_ATTEMPTS: DAILY_ATTEMPTS,
     MIN_HOLD_MS: MIN_HOLD_MS,
+    MAX_HOLD_MS: MAX_HOLD_MS,
     localDayIndex: localDayIndex,
     issueNumber: issueNumber,
     mulberry32: mulberry32,
